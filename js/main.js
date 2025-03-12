@@ -3,44 +3,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 加载数据服务
     loadDataService().then(() => {
-        // 加载俱乐部数据并显示
-        loadAndDisplayClubs();
-        // 更新统计数据
-        updateStatistics();
-        // 加载并显示公告
-        loadAndDisplayAnnouncements();
-    }).catch(error => {
-        console.error('无法加载数据服务:', error);
-        // 如果数据加载失败，显示错误信息
-        showErrorMessage('系统正在维护，请稍后再试');
+        // 此处放置需要在数据加载后执行的初始化逻辑
+        // 例如：setupCategoryFilters(), loadAndDisplayClubs()等
     });
-
-    // 设置登录按钮事件
-    setupLoginButton();
-    
-    // 设置视图切换功能
-    setupViewToggle();
-    
-    // 设置分类筛选功能
-    setupCategoryFilters();
-    
-    // 初始加载后，设置一个定时器定期检查Logo元素
-    setInterval(ensureLogosVisible, 500);
 });
 
 // 加载数据服务
-function loadDataService() {
-    return new Promise((resolve, reject) => {
-        if (window.PokerRadarDataService) {
+async function loadDataService() {
+    // 这里可能是异步加载数据逻辑
+    return new Promise((resolve) => {
+        // 模拟异步加载
+        setTimeout(() => {
+            // 数据加载完成
             resolve();
-            return;
-        }
-        
-        const script = document.createElement('script');
-        script.src = 'admin/js/data-service.js';
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
+        }, 100);
     });
 }
 
@@ -50,375 +26,475 @@ let activeCategory = 'all';
 // 设置分类筛选功能
 function setupCategoryFilters() {
     const categoryButtons = document.querySelectorAll('.category-button');
+    if (!categoryButtons.length) return;
     
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // 移除所有按钮的active类
-            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            const category = this.dataset.category;
+            if (category === activeCategory) return;
             
-            // 为当前点击的按钮添加active类
+            // 更新活跃分类
+            activeCategory = category;
+            
+            // 更新UI
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // 设置当前活跃的分类
-            activeCategory = this.getAttribute('data-category');
-            
-            // 重新加载并显示过滤后的俱乐部
-            loadAndDisplayClubs();
+            // 筛选俱乐部
+            filterClubsByCategory(window.clubsData, category);
         });
     });
 }
 
 // 加载并显示所有俱乐部
 function loadAndDisplayClubs() {
-    if (!window.PokerRadarDataService) {
-        console.error('数据服务不可用');
-        return;
-    }
-    
-    const clubs = window.PokerRadarDataService.getAllClubs();
-    const filteredClubs = filterClubsByCategory(clubs, activeCategory);
     const clubsContainer = document.querySelector('.clubs-container');
+    if (!clubsContainer) return;
     
-    // 清空现有内容
+    // 清空容器
     clubsContainer.innerHTML = '';
     
-    // 没有俱乐部时显示提示
-    if (filteredClubs.length === 0) {
-        clubsContainer.innerHTML = '<div class="no-clubs-message">没有符合条件的俱乐部，请尝试其他分类！</div>';
-        return;
+    // 从dataLoader获取俱乐部数据
+    if (window.clubsData && window.clubsData.length) {
+        // 按质押金额排序
+        const sortedClubs = [...window.clubsData].sort((a, b) => b.pledgeAmount - a.pledgeAmount);
+        
+        // 应用当前的分类过滤器
+        filterClubsByCategory(sortedClubs, activeCategory);
+        
+        // 更新质押金额排行榜
+        updatePledgeRanking(sortedClubs);
+    } else {
+        clubsContainer.innerHTML = '<div class="error-message">暂无俱乐部数据</div>';
     }
-    
-    // 为每个俱乐部创建卡片
-    filteredClubs.forEach(club => {
-        const clubCard = createClubCard(club);
-        clubsContainer.appendChild(clubCard);
-    });
 }
 
 // 根据分类筛选俱乐部
 function filterClubsByCategory(clubs, category) {
-    if (category === 'all') {
-        return clubs;
+    const clubsContainer = document.querySelector('.clubs-container');
+    if (!clubsContainer || !clubs) return;
+    
+    // 清空容器
+    clubsContainer.innerHTML = '';
+    
+    // 筛选符合当前分类的俱乐部
+    let filteredClubs = clubs;
+    
+    if (category !== 'all') {
+        filteredClubs = clubs.filter(club => {
+            if (category === 'available') {
+                return club.status === 'available';
+            }
+            if (category === 'recommended') {
+                return club.isRecommended;
+            }
+            if (category === 'new') {
+                // 定义"新"为加入时间在30天内
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const joinDate = new Date(club.joinDate);
+                return joinDate >= thirtyDaysAgo;
+            }
+            if (category === 'platform') {
+                return club.platform === category;
+            }
+            return true;
+        });
     }
     
-    return clubs.filter(club => {
-        // 根据是否质押过滤
-        if (category === 'pledged') {
-            return club.isPledged === true;
-        }
-        
-        // 根据级别大小过滤
-        if (category === 'small' || category === 'medium' || category === 'large') {
-            // 提取级别中的数字，如 "2/5" 提取出 2 和 5
-            const levelMatch = (club.level || '').match(/(\d+)\/(\d+)/);
-            if (!levelMatch) return false;
-            
-            const smallBlind = parseInt(levelMatch[1], 10);
-            const bigBlind = parseInt(levelMatch[2], 10);
-            
-            // 根据大盲注的大小来确定级别
-            if (category === 'small') {
-                return bigBlind <= 5; // 小级别：大盲注 <= 5
-            } else if (category === 'medium') {
-                return bigBlind > 5 && bigBlind <= 15; // 中级别：5 < 大盲注 <= 15
-            } else if (category === 'large') {
-                return bigBlind > 15; // 大级别：大盲注 > 15
-            }
-        }
-        
-        return false;
-    });
+    // 显示筛选后的俱乐部
+    if (filteredClubs.length) {
+        filteredClubs.forEach(club => {
+            const clubCard = createClubCard(club);
+            clubsContainer.appendChild(clubCard);
+        });
+    } else {
+        clubsContainer.innerHTML = '<div class="error-message">没有符合条件的俱乐部</div>';
+    }
 }
 
 // 创建俱乐部卡片
 function createClubCard(club) {
     const card = document.createElement('div');
-    card.className = 'club-card';
-    card.id = `club-${club.id}`;
+    card.className = `club-card ${club.status}`;
+    card.dataset.id = club.id;
     
-    // 可用状态类名
-    const availabilityClass = club.status === 'available' ? 'available' : 'maintenance';
-    // 质押状态类名
-    const pledgeStatusClass = club.isPledged ? 'pledged' : 'unpledged';
+    // 左侧信息
+    const leftInfo = document.createElement('div');
+    leftInfo.className = 'left-info';
     
-    // 使用背景图片而不是img标签
-    const logoStyle = club.logoUrl ? 
-        `background-image: url('${club.logoUrl}'); background-size: contain; background-position: center; background-repeat: no-repeat;` : 
-        '';
+    // 俱乐部Logo
+    const logoContainer = document.createElement('div');
+    logoContainer.className = 'club-logo-container';
     
-    // 构建卡片内容
-    card.innerHTML = `
-        <div class="card-header">
-            <div class="club-identity">
-                <div class="club-logo" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; margin-right: 10px; border-radius: 4px; background-color: #121212; ${logoStyle}"></div>
-                <h2 class="club-name">${club.name}</h2>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="left-info">
-                <div class="platform-info">
-                    <div class="platform-logo">${club.platform}</div>
-                    <span class="level-tag">${club.level}</span>
-                </div>
-                <div class="time-schedule">
-                    <div class="time-label">开放时间</div>
-                    <div class="time-bar">
-                        <div class="time-range">${club.operationTime}</div>
-                    </div>
-                </div>
-                <div class="payment-methods">
-                    ${club.paymentMethods.includes('支付宝') ? 
-                        '<div class="payment-icon" title="支付宝"><img src="images/payment/alipay.png" alt="支付宝" class="payment-logo"></div>' : ''}
-                    ${club.paymentMethods.includes('微信支付') ? 
-                        '<div class="payment-icon" title="微信支付"><img src="images/payment/wechat.png" alt="微信支付" class="payment-logo"></div>' : ''}
-                    ${club.paymentMethods.includes('USDT') ? 
-                        '<div class="payment-icon" title="USDT"><img src="images/payment/usdt.png" alt="USDT" class="payment-logo"></div>' : ''}
-                    ${club.paymentMethods.includes('银行转账') ? 
-                        '<div class="payment-icon" title="银行转账"><img src="images/payment/unipay.png" alt="银行转账" class="payment-logo"></div>' : ''}
-                </div>
-            </div>
-            <div class="right-info">
-                <p class="club-slogan">${club.slogan || '高品质线上德州俱乐部'}</p>
-                <div class="status-info">
-                    <div class="player-count">
-                        <span class="count-label">在线玩家:</span>
-                        <span class="count-value">${club.playerCount}</span>
-                    </div>
-                    <div class="availability ${availabilityClass}">
-                        <span class="status-dot"></span>
-                        <span class="status-text">${club.status === 'available' ? '当前可加入' : '维护中'}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-actions">
-            <button class="join-button" data-club-id="${club.id}">立即加入</button>
-            <a href="#" class="report-link" data-club-id="${club.id}">举报</a>
-        </div>
-        <div class="pledge-status ${pledgeStatusClass}">
-            <div class="${club.isPledged ? 'shield-icon' : 'warning-icon'}"></div>
-            <span class="pledge-text">${club.isPledged ? `质押 ${club.pledgeAmount} USDT` : '未质押'}</span>
-        </div>
-    `;
+    const logo = document.createElement('img');
+    logo.className = 'club-logo';
+    logo.src = club.logo || 'images/default-logo.png';
+    logo.alt = `${club.name} Logo`;
+    logo.loading = 'lazy';
     
-    // 添加按钮事件
-    const joinButton = card.querySelector('.join-button');
-    joinButton.addEventListener('click', function() {
+    logoContainer.appendChild(logo);
+    
+    // 俱乐部名称和标语
+    const nameContainer = document.createElement('div');
+    nameContainer.className = 'club-name-container';
+    
+    const name = document.createElement('h3');
+    name.className = 'club-name';
+    name.textContent = club.name;
+    
+    const slogan = document.createElement('p');
+    slogan.className = 'club-slogan';
+    slogan.textContent = club.slogan || '无标语';
+    
+    nameContainer.appendChild(name);
+    nameContainer.appendChild(slogan);
+    
+    leftInfo.appendChild(logoContainer);
+    leftInfo.appendChild(nameContainer);
+    
+    // 中间信息
+    const midInfo = document.createElement('div');
+    midInfo.className = 'mid-info';
+    
+    // 平台信息
+    const platform = document.createElement('div');
+    platform.className = 'platform-info';
+    platform.innerHTML = `<span class="info-label">平台:</span> <span class="info-value">${club.platform}</span>`;
+    
+    // 级别信息
+    const levels = document.createElement('div');
+    levels.className = 'levels-info';
+    levels.innerHTML = `<span class="info-label">级别:</span> <span class="info-value">${club.levels.join('/')}</span>`;
+    
+    // 支付方式
+    const payment = document.createElement('div');
+    payment.className = 'payment-info';
+    payment.innerHTML = `<span class="info-label">支付:</span> <span class="info-value">${club.paymentMethods.join(', ')}</span>`;
+    
+    // 在线玩家
+    const players = document.createElement('div');
+    players.className = 'players-info';
+    players.innerHTML = `<span class="info-label">在线:</span> <span class="info-value players-count">${club.onlinePlayers || 0}</span>`;
+    
+    midInfo.appendChild(platform);
+    midInfo.appendChild(levels);
+    midInfo.appendChild(payment);
+    midInfo.appendChild(players);
+    
+    // 右侧信息
+    const rightInfo = document.createElement('div');
+    rightInfo.className = 'right-info';
+    
+    // 质押状态
+    const pledgeStatus = document.createElement('div');
+    pledgeStatus.className = 'pledge-status';
+    
+    const pledgeLabel = document.createElement('span');
+    pledgeLabel.className = 'info-label';
+    pledgeLabel.textContent = '质押金额:';
+    
+    const pledgeValue = document.createElement('span');
+    pledgeValue.className = 'info-value pledge-amount';
+    pledgeValue.textContent = `¥${club.pledgeAmount.toLocaleString()}`;
+    
+    pledgeStatus.appendChild(pledgeLabel);
+    pledgeStatus.appendChild(pledgeValue);
+    
+    // 状态指示
+    const statusIndicator = document.createElement('div');
+    statusIndicator.className = 'status-indicator';
+    
+    const statusDot = document.createElement('span');
+    statusDot.className = 'status-dot';
+    
+    const statusText = document.createElement('span');
+    statusText.className = 'status-text';
+    statusText.textContent = club.status === 'available' ? '开局中' : '未开局';
+    
+    statusIndicator.appendChild(statusDot);
+    statusIndicator.appendChild(statusText);
+    
+    // 操作按钮
+    const actions = document.createElement('div');
+    actions.className = 'club-actions';
+    
+    const joinButton = document.createElement('button');
+    joinButton.className = 'action-button join-club';
+    joinButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> 加入俱乐部';
+    joinButton.addEventListener('click', function(e) {
+        e.stopPropagation();
         joinClub(club);
     });
     
-    const reportLink = card.querySelector('.report-link');
-    reportLink.addEventListener('click', function(e) {
-        e.preventDefault();
+    const reportButton = document.createElement('button');
+    reportButton.className = 'action-button report-club';
+    reportButton.innerHTML = '<i class="fas fa-flag"></i> 举报';
+    reportButton.addEventListener('click', function(e) {
+        e.stopPropagation();
         reportClub(club);
     });
+    
+    actions.appendChild(joinButton);
+    actions.appendChild(reportButton);
+    
+    rightInfo.appendChild(pledgeStatus);
+    rightInfo.appendChild(statusIndicator);
+    rightInfo.appendChild(actions);
+    
+    // 组装卡片
+    card.appendChild(leftInfo);
+    card.appendChild(midInfo);
+    card.appendChild(rightInfo);
     
     return card;
 }
 
 // 确保Logo元素持续可见
 function ensureLogosVisible() {
-    const logoElements = document.querySelectorAll('.club-logo');
-    logoElements.forEach(logo => {
-        // 确保元素可见并且样式属性保持不变
-        logo.style.width = '120px';
-        logo.style.height = '120px';
-        logo.style.minWidth = '120px';
-        logo.style.minHeight = '120px';
-        logo.style.marginRight = '10px';
-        logo.style.display = 'block';
-        
-        // 如果有背景图，确保背景图的设置正确
-        if (logo.style.backgroundImage) {
-            logo.style.backgroundSize = 'contain';
-            logo.style.backgroundPosition = 'center';
-            logo.style.backgroundRepeat = 'no-repeat';
-        }
+    const logos = document.querySelectorAll('.club-logo');
+    if (!logos.length) return;
+    
+    // 使用Intersection Observer监视logo元素的可见性
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+                // 当logo不在视口内时，延迟加载
+                const logo = entry.target;
+                const src = logo.src;
+                logo.src = '';
+                
+                setTimeout(() => {
+                    logo.src = src;
+                }, 10);
+            }
+        });
+    }, {
+        root: null,
+        threshold: 0.1
+    });
+    
+    // 监视所有logo
+    logos.forEach(logo => {
+        observer.observe(logo);
     });
 }
 
 // 更新页面顶部的统计数据
 function updateStatistics() {
-    if (!window.PokerRadarDataService) {
-        return;
+    const totalClubsElement = document.getElementById('total-clubs');
+    const totalPlayersElement = document.getElementById('total-players');
+    const totalPledgeElement = document.getElementById('total-pledge');
+    
+    if (!totalClubsElement || !totalPlayersElement || !totalPledgeElement) return;
+    
+    // 从clubsData中计算统计数据
+    if (window.clubsData && window.clubsData.length) {
+        // 俱乐部总数
+        const totalClubs = window.clubsData.length;
+        
+        // 在线玩家总数
+        const totalPlayers = window.clubsData.reduce((sum, club) => {
+            return sum + (club.onlinePlayers || 0);
+        }, 0);
+        
+        // 总质押金额
+        const totalPledge = window.clubsData.reduce((sum, club) => {
+            return sum + (club.pledgeAmount || 0);
+        }, 0);
+        
+        // 更新DOM
+        totalClubsElement.textContent = totalClubs;
+        totalPlayersElement.textContent = totalPlayers;
+        totalPledgeElement.textContent = `¥${totalPledge.toLocaleString()}`;
+        
+        // 使用计数器动画效果
+        animateCounter(totalClubsElement, totalClubs);
+        animateCounter(totalPlayersElement, totalPlayers);
+        animateCounter(totalPledgeElement, `¥${totalPledge.toLocaleString()}`);
     }
-    
-    const clubs = window.PokerRadarDataService.getAllClubs();
-    
-    // 更新俱乐部数量
-    const clubCountEl = document.querySelector('.club-count');
-    if (clubCountEl) {
-        clubCountEl.textContent = clubs.length;
-    }
-    
-    // 计算质押总额
-    let totalPledge = 0;
-    clubs.forEach(club => {
-        if (club.isPledged && club.pledgeAmount) {
-            // 移除非数字字符并转换为数字
-            const amount = parseInt(club.pledgeAmount.toString().replace(/[^\d]/g, ''), 10);
-            if (!isNaN(amount)) {
-                totalPledge += amount;
-            }
-        }
-    });
-    
-    // 更新质押总额
-    const pledgeAmountEl = document.querySelector('.pledge-amount');
-    if (pledgeAmountEl) {
-        // 格式化数字（添加千位分隔符）
-        pledgeAmountEl.textContent = totalPledge.toLocaleString();
-    }
-    
-    // 更新质押信任榜
-    updatePledgeRanking(clubs);
 }
 
 // 更新质押信任榜
 function updatePledgeRanking(clubs) {
-    // 筛选有质押的俱乐部
-    const pledgedClubs = clubs.filter(club => club.isPledged && club.pledgeAmount);
+    const rankingContainer = document.querySelector('.trust-ranking-list');
+    if (!rankingContainer || !clubs || !clubs.length) return;
     
-    // 按质押金额降序排序
-    pledgedClubs.sort((a, b) => {
-        const amountA = parseInt(a.pledgeAmount.toString().replace(/[^\d]/g, ''), 10);
-        const amountB = parseInt(b.pledgeAmount.toString().replace(/[^\d]/g, ''), 10);
-        return amountB - amountA;
-    });
+    // 清空容器
+    rankingContainer.innerHTML = '';
     
-    // 获取前5名
-    const topClubs = pledgedClubs.slice(0, 5);
+    // 按质押金额排序并获取前5名
+    const topClubs = [...clubs]
+        .sort((a, b) => b.pledgeAmount - a.pledgeAmount)
+        .slice(0, 5);
     
-    // 找到质押信任榜容器
-    const rankList = document.querySelector('.rank-list');
-    if (!rankList) return;
-    
-    // 清空现有内容
-    rankList.innerHTML = '';
-    
-    // 添加前5名俱乐部到排行榜
+    // 创建排行榜项目
     topClubs.forEach((club, index) => {
-        const position = index + 1;
         const rankItem = document.createElement('div');
         rankItem.className = 'rank-item';
         
-        // 格式化质押金额
-        const formattedPledge = parseInt(club.pledgeAmount).toLocaleString() + ' USDT';
+        // 排名
+        const rankNumber = document.createElement('div');
+        rankNumber.className = 'rank-number';
+        rankNumber.textContent = index + 1;
         
-        rankItem.innerHTML = `
-            <div class="rank-position">
-                ${position === 1 ? '<span class="crown-icon"></span>' : ''}
-                <span class="position-number">${position}</span>
-            </div>
-            <div class="rank-info">
-                <span class="rank-name">${club.name}</span>
-                <span class="rank-pledge">${formattedPledge}</span>
-            </div>
-        `;
+        // 俱乐部信息
+        const rankInfo = document.createElement('div');
+        rankInfo.className = 'rank-info';
         
-        rankList.appendChild(rankItem);
+        const clubLogo = document.createElement('img');
+        clubLogo.className = 'rank-logo';
+        clubLogo.src = club.logo || 'images/default-logo.png';
+        clubLogo.alt = `${club.name} Logo`;
+        clubLogo.loading = 'lazy';
+        
+        const clubName = document.createElement('div');
+        clubName.className = 'rank-name';
+        clubName.textContent = club.name;
+        
+        rankInfo.appendChild(clubLogo);
+        rankInfo.appendChild(clubName);
+        
+        // 质押金额
+        const pledgeAmount = document.createElement('div');
+        pledgeAmount.className = 'rank-pledge';
+        pledgeAmount.textContent = `¥${club.pledgeAmount.toLocaleString()}`;
+        
+        // 组装排行项
+        rankItem.appendChild(rankNumber);
+        rankItem.appendChild(rankInfo);
+        rankItem.appendChild(pledgeAmount);
+        
+        rankingContainer.appendChild(rankItem);
     });
 }
 
 // 加入俱乐部逻辑
 function joinClub(club) {
-    // 假设这里会打开加入俱乐部的对话框或导向注册页面
-    alert(`即将加入俱乐部: ${club.name}\n请联系客服获取加入邀请码`);
+    // 实现加入俱乐部的功能
+    console.log(`加入俱乐部: ${club.name}`);
+    showErrorMessage('该功能即将上线，敬请期待!');
 }
 
 // 举报俱乐部逻辑
 function reportClub(club) {
-    // 假设这里会打开举报对话框
-    alert(`您正在举报俱乐部: ${club.name}\n请提供具体问题以帮助我们处理`);
+    // 实现举报俱乐部的功能
+    console.log(`举报俱乐部: ${club.name}`);
+    showErrorMessage('举报功能即将上线，敬请期待!');
 }
 
 // 显示错误消息
 function showErrorMessage(message) {
-    const clubsContainer = document.querySelector('.clubs-container');
-    clubsContainer.innerHTML = `<div class="error-message">${message}</div>`;
+    const messageBox = document.createElement('div');
+    messageBox.className = 'error-toast';
+    messageBox.textContent = message;
+    
+    document.body.appendChild(messageBox);
+    
+    // 2秒后自动消失
+    setTimeout(() => {
+        messageBox.classList.add('fade-out');
+        setTimeout(() => {
+            document.body.removeChild(messageBox);
+        }, 300);
+    }, 2000);
 }
 
 // 设置登录按钮事件
 function setupLoginButton() {
-    const loginButton = document.querySelector('.login-button');
-    if (loginButton) {
-        loginButton.addEventListener('click', function() {
-            window.location.href = 'admin/login.html';
-        });
-    }
+    const loginBtn = document.querySelector('.login-button');
+    if (!loginBtn) return;
+    
+    loginBtn.addEventListener('click', function() {
+        showErrorMessage('登录功能即将上线，敬请期待!');
+    });
 }
 
 // 加载并显示公告
 function loadAndDisplayAnnouncements() {
-    if (!window.PokerRadarDataService) {
-        console.error('数据服务不可用');
-        return;
-    }
+    const announcementContainer = document.querySelector('.announcement-items');
+    if (!announcementContainer) return;
     
-    // 获取活跃的公告
-    const activeAnnouncements = window.PokerRadarDataService.getActiveAnnouncements();
+    // 模拟公告数据
+    const announcements = [
+        {
+            id: 1,
+            content: '欢迎来到扑克雷达 - 专业的德州扑克俱乐部聚合平台!',
+            type: 'info',
+            date: '2023-06-01'
+        },
+        {
+            id: 2,
+            content: '新功能上线: 质押信任机制，为玩家提供更多保障!',
+            type: 'new',
+            date: '2023-06-15'
+        },
+        {
+            id: 3,
+            content: '安全提醒: 请仔细核对俱乐部信息，确保资金安全',
+            type: 'warning',
+            date: '2023-06-20'
+        },
+        {
+            id: 4,
+            content: '新增5家优质俱乐部，更多选择等你来体验!',
+            type: 'info',
+            date: '2023-07-01'
+        },
+        {
+            id: 5,
+            content: '系统将于本周六凌晨2点-4点进行升级维护，请提前安排游戏时间',
+            type: 'warning',
+            date: '2023-07-10'
+        }
+    ];
     
-    if (activeAnnouncements && activeAnnouncements.length > 0) {
-        // 获取第一条活跃公告
-        const announcementText = document.querySelector('.announcement-text');
-        if (announcementText) {
-            // 组合所有活跃公告内容
-            let combinedText = activeAnnouncements.map(a => a.text).join(' | ');
-            announcementText.textContent = combinedText;
-            
-            // 如果没有父容器可见，则让整个公告部分显示
-            const announcementSection = document.querySelector('.sidebar-module.announcements');
-            if (announcementSection) {
-                announcementSection.style.display = 'block';
-            }
-            
-            // 初始化滚动效果
-            initAnnouncementScroll();
-        }
-    } else {
-        // 如果没有活跃公告，隐藏公告部分
-        const announcementSection = document.querySelector('.sidebar-module.announcements');
-        if (announcementSection) {
-            announcementSection.style.display = 'none';
-        }
-    }
+    // 清空容器
+    announcementContainer.innerHTML = '';
+    
+    // 添加公告项
+    announcements.forEach(announcement => {
+        const item = document.createElement('div');
+        item.className = `announcement-item ${announcement.type}`;
+        
+        const icon = document.createElement('i');
+        icon.className = announcement.type === 'warning' ? 
+            'fas fa-exclamation-triangle' : 
+            (announcement.type === 'new' ? 'fas fa-star' : 'fas fa-bullhorn');
+        
+        const content = document.createElement('span');
+        content.className = 'announcement-content';
+        content.textContent = announcement.content;
+        
+        item.appendChild(icon);
+        item.appendChild(content);
+        
+        announcementContainer.appendChild(item);
+    });
+    
+    // 初始化滚动效果
+    initAnnouncementScroll();
 }
 
 // 初始化公告滚动效果
 function initAnnouncementScroll() {
-    const announcementText = document.querySelector('.announcement-text');
-    if (!announcementText) return;
+    const container = document.querySelector('.announcement-items');
+    if (!container) return;
     
-    // 复制公告内容以实现无缝滚动
-    const originalText = announcementText.textContent;
-    announcementText.textContent = originalText + ' ' + originalText;
+    const items = container.querySelectorAll('.announcement-item');
+    if (items.length <= 1) return; // 只有一个或没有公告时不需要滚动
     
-    // 设置鼠标悬停暂停滚动
-    const announcementContainer = document.querySelector('.announcement-container');
-    if (announcementContainer) {
-        announcementContainer.addEventListener('mouseenter', function() {
-            announcementText.style.animationPlayState = 'paused';
-        });
-        
-        announcementContainer.addEventListener('mouseleave', function() {
-            announcementText.style.animationPlayState = 'running';
-        });
-    }
+    // 复制公告以实现无缝滚动
+    items.forEach(item => {
+        const clone = item.cloneNode(true);
+        container.appendChild(clone);
+    });
     
-    // 添加暂停/播放按钮功能
-    const pauseButton = document.querySelector('.announcement-controls .pause');
-    if (pauseButton) {
-        pauseButton.addEventListener('click', function() {
-            if (announcementText.style.animationPlayState === 'running' || 
-                !announcementText.style.animationPlayState) {
-                announcementText.style.animationPlayState = 'paused';
-                this.textContent = '播放';
-            } else {
-                announcementText.style.animationPlayState = 'running';
-                this.textContent = '暂停';
-            }
-        });
-    }
+    // 设置滚动动画
+    container.style.animationDuration = `${items.length * 5}s`; // 每个公告5秒
+    container.style.animationName = 'scrollAnnouncement';
+    container.style.animationTimingFunction = 'linear';
+    container.style.animationIterationCount = 'infinite';
 }
 
 // 设置视图切换功能
@@ -426,48 +502,37 @@ function setupViewToggle() {
     const viewButtons = document.querySelectorAll('.view-button');
     const clubsContainer = document.querySelector('.clubs-container');
     
-    if(!viewButtons.length || !clubsContainer) return;
+    if (!viewButtons.length || !clubsContainer) return;
     
-    // 检查本地存储中是否有保存的视图首选项
-    const savedView = localStorage.getItem('preferredView');
-    if(savedView) {
-        // 应用保存的视图模式
-        viewButtons.forEach(button => {
-            const viewType = button.getAttribute('data-view');
-            button.classList.toggle('active', viewType === savedView);
-        });
-        
-        if(savedView === 'list') {
-            clubsContainer.classList.add('list-view');
+    // 从localStorage获取上次的视图设置
+    const savedView = localStorage.getItem('pokerRadarViewMode') || 'grid';
+    
+    // 应用保存的视图模式
+    clubsContainer.className = `clubs-container ${savedView}-view`;
+    
+    // 更新按钮状态
+    viewButtons.forEach(button => {
+        if (button.dataset.view === savedView) {
+            button.classList.add('active');
         } else {
-            clubsContainer.classList.remove('list-view');
+            button.classList.remove('active');
         }
-    }
+    });
     
-    // 为每个视图按钮添加点击事件
+    // 设置点击事件
     viewButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // 移除所有按钮的active类
-            viewButtons.forEach(btn => btn.classList.remove('active'));
+            const view = this.dataset.view;
             
-            // 为当前点击的按钮添加active类
+            // 更新视图
+            clubsContainer.className = `clubs-container ${view}-view`;
+            
+            // 更新按钮状态
+            viewButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // 获取视图类型
-            const viewType = this.getAttribute('data-view');
-            
-            // 保存用户首选项到本地存储
-            localStorage.setItem('preferredView', viewType);
-            
-            // 应用视图变化
-            if(viewType === 'list') {
-                clubsContainer.classList.add('list-view');
-            } else {
-                clubsContainer.classList.remove('list-view');
-            }
-            
-            // 确保在视图切换后Logo元素正确显示
-            setTimeout(ensureLogosVisible, 100);
+            // 保存设置
+            localStorage.setItem('pokerRadarViewMode', view);
         });
     });
 }

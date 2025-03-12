@@ -18,7 +18,7 @@ function detectDeviceAndRedirect() {
     const currentUrl = window.location.href;
     
     // 检查URL是否已经包含移动版本标识
-    const isMobilePage = currentUrl.includes('mobile=true') || currentUrl.includes('mobile.html');
+    const isMobilePage = currentUrl.includes('mobile=true') || currentUrl.includes('mobile.html') || currentUrl.includes('mobile/');
     const isPcPage = currentUrl.includes('pc=true') || !currentUrl.includes('mobile');
     
     // 检测是否为移动设备
@@ -31,8 +31,8 @@ function detectDeviceAndRedirect() {
     // 根据设备类型和当前页面决定是否需要重定向
     if (isHomePage) {
         if (isMobileDevice && !isMobilePage) {
-            // 移动设备访问PC版本，重定向到移动版本
-            window.location.href = 'mobile.html';
+            // 移动设备访问PC版本，重定向到mobile文件夹中的完整移动版本
+            window.location.href = 'mobile/index.html';
         } else if (!isMobileDevice && isMobilePage) {
             // PC设备访问移动版本，重定向到PC版本
             window.location.href = 'index.html?pc=true';
