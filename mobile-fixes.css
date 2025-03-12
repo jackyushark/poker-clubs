@@ -1,0 +1,245 @@
+/* 移动端优化样式 - 2025-03-12 */
+
+/* 针对所有移动设备的基础优化 */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+  
+  .main-container {
+    padding: 10px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+  }
+  
+  .brand-area, .function-area {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .quick-links {
+    gap: 5px;
+  }
+  
+  .link {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  /* 控件区域优化 */
+  .controls-wrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+  }
+  
+  .view-controls, .categories-filter {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 5px;
+  }
+
+  .categories-filter {
+    padding: 5px 0;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 5px;
+    margin-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .category-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  
+  /* 卡片优化 */
+  .clubs-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .club-card {
+    height: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-header {
+    padding: 15px;
+  }
+  
+  .club-logo {
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px !important;
+    min-height: 70px !important;
+  }
+  
+  .club-name {
+    font-size: 18px;
+    margin-top: 8px;
+  }
+  
+  .card-body {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .left-info, .right-info {
+    width: 100%;
+  }
+  
+  .right-info {
+    padding-left: 0;
+    border-left: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .card-footer {
+    padding: 12px 15px;
+  }
+
+  /* 侧边栏优化 */
+  .sidebar {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+  }
+  
+  .sidebar-module {
+    margin-bottom: 20px;
+  }
+}
+
+/* 针对手机的额外优化 */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 10px;
+  }
+  
+  .radar-icon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .brand-name {
+    font-size: 22px;
+  }
+  
+  .club-logo {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+  }
+  
+  .club-logo img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .pledge-amount {
+    font-size: 14px;
+  }
+  
+  .card-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .stats-item {
+    font-size: 12px;
+  }
+  
+  /* 移动端列表视图优化 */
+  .clubs-container.list-view .club-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 12px;
+  }
+  
+  .clubs-container.list-view .card-header {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0;
+  }
+  
+  .clubs-container.list-view .club-identity {
+    flex-direction: column;
+  }
+  
+  .clubs-container.list-view .club-logo {
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    min-height: 45px !important;
+  }
+  
+  .clubs-container.list-view .card-body {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .clubs-container.list-view .card-footer {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+  
+  .clubs-container.list-view .left-info,
+  .clubs-container.list-view .right-info {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .clubs-container.list-view .info-item {
+    margin-bottom: 4px;
+  }
+  
+  /* 确保语言选择器在移动端可见 */
+  .language-selector {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  /* 修复滚动问题 */
+  .card-content {
+    overflow-x: hidden;
+  }
+}
+
+/* 强制修复 - 覆盖内联样式 */
+@media (max-width: 768px) {
+  [style*="width"][style*="120px"] {
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px !important;
+    min-height: 70px !important;
+  }
+  
+  @media (max-width: 480px) {
+    [style*="width"][style*="120px"] {
+      width: 60px !important;
+      height: 60px !important;
+      min-width: 60px !important;
+      min-height: 60px !important;
+    }
+  }
+}
