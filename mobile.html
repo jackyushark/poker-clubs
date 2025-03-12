@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>扑克雷达 - 移动版</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20250312012250">
+    <link rel="stylesheet" href="mobile-fixes.css?v=20250312191845">
+    <meta name="modified" content="2025-03-12 19:18:45">
+    <style>
+        /* 移动端专用样式 */
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: #0A0A0A;
+        }
+        
+        /* 移动版页头 */
+        .mobile-header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* 移动版LOGO区域 */
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mobile-radar-icon {
+            width: 28px;
+            height: 28px;
+            background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0) 70%);
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        .mobile-radar-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: #FFD700;
+            border-radius: 50%;
+        }
+        
+        .mobile-brand-name {
+            font-family: 'Bebas Neue', sans-serif;
+            color: #FFD700;
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+        
+        /* 移动版功能区域 */
+        .mobile-functions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mobile-login-button {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(184,134,11,0.2) 100%);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .mobile-language-selector {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 3px;
+        }
+        
+        .mobile-current-lang {
+            background-color: #FFD700;
+            color: #0A0A0A;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .mobile-lang-option {
+            color: #FFFFFF;
+            padding: 3px 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* 移动版筛选器 */
+        .mobile-filters {
+            padding: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .mobile-filters::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .mobile-category-buttons {
+            display: inline-flex;
+            gap: 8px;
+        }
+        
+        .mobile-category-button {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .mobile-category-button.active {
+            background-color: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+        }
+        
+        /* 移动版俱乐部卡片 */
+        .mobile-clubs-container {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .mobile-club-card {
+            background-color: #121212;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mobile-card-header {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mobile-club-logo {
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            border-radius: 4px;
+            background-color: #1A1A1A;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        
+        .mobile-club-info {
+            flex: 1;
+        }
+        
+        .mobile-club-name {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            color: #FFFFFF;
+            margin: 0 0 3px 0;
+        }
+        
+        .mobile-pledge-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        
+        .mobile-pledged {
+            color: #FFD700;
+        }
+        
+        .mobile-unpledged {
+            color: #EB5757;
+        }
+        
+        .mobile-card-body {
+            padding: 0 12px 12px 12px;
+        }
+        
+        .mobile-platform-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .mobile-platform-logo {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .mobile-level-tag {
+            background-color: rgba(255, 215, 0, 0.15);
+            color: #FFD700;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .mobile-status-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        
+        .mobile-player-count {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .mobile-count-value {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        
+        .mobile-availability {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mobile-available {
+            color: #27AE60;
+        }
+        
+        .mobile-status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #27AE60;
+        }
+        
+        .mobile-card-footer {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-join-button {
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            border: none;
+            color: #0A0A0A;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .mobile-report-link {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="mobile-header">
+        <div class="mobile-brand">
+            <div class="mobile-radar-icon"></div>
+            <h1 class="mobile-brand-name">POKER RADAR</h1>
+        </div>
+        <div class="mobile-functions">
+            <button class="mobile-login-button">登录</button>
+            <div class="mobile-language-selector">
+                <span class="mobile-current-lang">中</span>
+                <span class="mobile-lang-option">EN</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-filters">
+        <div class="mobile-category-buttons">
+            <button class="mobile-category-button active" data-category="all">全部</button>
+            <button class="mobile-category-button" data-category="pledged">已质押</button>
+            <button class="mobile-category-button" data-category="small">小级别</button>
+            <button class="mobile-category-button" data-category="medium">中级别</button>
+            <button class="mobile-category-button" data-category="large">大级别</button>
+        </div>
+    </div>
+
+    <main class="mobile-clubs-container">
+        <!-- 移动版俱乐部卡片1 -->
+        <div class="mobile-club-card">
+            <div class="mobile-card-header">
+                <div class="mobile-club-logo" style="background-image: url('https://via.placeholder.com/50');"></div>
+                <div class="mobile-club-info">
+                    <h2 class="mobile-club-name">鲨鱼扑克</h2>
+                    <div class="mobile-pledge-status mobile-pledged">
+                        <span>已质押 50,000 USDT</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-body">
+                <div class="mobile-platform-info">
+                    <div class="mobile-platform-logo">微扑克</div>
+                    <div class="mobile-level-tag">5/10</div>
+                </div>
+                <div class="mobile-time-info">开放时间: 11:00-01:00</div>
+                <div class="mobile-status-info">
+                    <div class="mobile-player-count">
+                        在线玩家: <span class="mobile-count-value">42</span>
+                    </div>
+                    <div class="mobile-availability mobile-available">
+                        <span class="mobile-status-dot"></span>
+                        <span>可加入</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-footer">
+                <button class="mobile-join-button">立即加入</button>
+                <a href="#" class="mobile-report-link">举报</a>
+            </div>
+        </div>
+
+        <!-- 移动版俱乐部卡片2 -->
+        <div class="mobile-club-card">
+            <div class="mobile-card-header">
+                <div class="mobile-club-logo" style="background-image: url('https://via.placeholder.com/50');"></div>
+                <div class="mobile-club-info">
+                    <h2 class="mobile-club-name">王牌俱乐部</h2>
+                    <div class="mobile-pledge-status mobile-unpledged">
+                        <span>未质押</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-body">
+                <div class="mobile-platform-info">
+                    <div class="mobile-platform-logo">HH</div>
+                    <div class="mobile-level-tag">3/5</div>
+                </div>
+                <div class="mobile-time-info">开放时间: 14:00-04:00</div>
+                <div class="mobile-status-info">
+                    <div class="mobile-player-count">
+                        在线玩家: <span class="mobile-count-value">28</span>
+                    </div>
+                    <div class="mobile-availability mobile-available">
+                        <span class="mobile-status-dot"></span>
+                        <span>可加入</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-footer">
+                <button class="mobile-join-button">立即加入</button>
+                <a href="#" class="mobile-report-link">举报</a>
+            </div>
+        </div>
+
+        <!-- 移动版俱乐部卡片3 -->
+        <div class="mobile-club-card">
+            <div class="mobile-card-header">
+                <div class="mobile-club-logo" style="background-image: url('https://via.placeholder.com/50');"></div>
+                <div class="mobile-club-info">
+                    <h2 class="mobile-club-name">黄金俱乐部</h2>
+                    <div class="mobile-pledge-status mobile-pledged">
+                        <span>已质押 30,000 USDT</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-body">
+                <div class="mobile-platform-info">
+                    <div class="mobile-platform-logo">PP</div>
+                    <div class="mobile-level-tag">10/20</div>
+                </div>
+                <div class="mobile-time-info">开放时间: 全天</div>
+                <div class="mobile-status-info">
+                    <div class="mobile-player-count">
+                        在线玩家: <span class="mobile-count-value">73</span>
+                    </div>
+                    <div class="mobile-availability mobile-available">
+                        <span class="mobile-status-dot"></span>
+                        <span>可加入</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-card-footer">
+                <button class="mobile-join-button">立即加入</button>
+                <a href="#" class="mobile-report-link">举报</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/device-detector.js?v=20250312191845" defer></script>
+    <script src="js/main.js?v=20250312012250" defer></script>
+</body>
+</html>

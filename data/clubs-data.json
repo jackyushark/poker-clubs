@@ -1,0 +1,87 @@
+{
+  "clubs": [
+    {
+      "id": "1",
+      "name": "鲨鱼扑克",
+      "logo": "https://via.placeholder.com/120",
+      "pledgeAmount": 50000,
+      "pledged": true,
+      "platform": "微扑克",
+      "level": "5/10",
+      "timeSchedule": "11:00-01:00",
+      "paymentMethods": ["alipay", "wechat", "usdt"],
+      "slogan": "高额桌首选，24小时极速到账",
+      "playerCount": 42,
+      "available": true,
+      "category": ["pledged", "medium"]
+    },
+    {
+      "id": "2",
+      "name": "王牌俱乐部",
+      "logo": "https://via.placeholder.com/120",
+      "pledgeAmount": 0,
+      "pledged": false,
+      "platform": "HH",
+      "level": "3/5",
+      "timeSchedule": "14:00-04:00",
+      "paymentMethods": ["alipay", "usdt"],
+      "slogan": "安全可靠，出款快速",
+      "playerCount": 28,
+      "available": true,
+      "category": ["unpledged", "small"]
+    },
+    {
+      "id": "3",
+      "name": "黄金俱乐部",
+      "logo": "https://via.placeholder.com/120",
+      "pledgeAmount": 30000,
+      "pledged": true,
+      "platform": "PP",
+      "level": "10/20",
+      "timeSchedule": "全天",
+      "paymentMethods": ["alipay", "wechat", "usdt"],
+      "slogan": "高手云集，大额无忧",
+      "playerCount": 73,
+      "available": true,
+      "category": ["pledged", "large"]
+    },
+    {
+      "id": "4",
+      "name": "皇家扑克",
+      "logo": "https://via.placeholder.com/120",
+      "pledgeAmount": 20000,
+      "pledged": true,
+      "platform": "GGP",
+      "level": "2/5",
+      "timeSchedule": "15:00-03:00",
+      "paymentMethods": ["alipay", "wechat"],
+      "slogan": "小级别最佳选择，稳定运营3年",
+      "playerCount": 35,
+      "available": true,
+      "category": ["pledged", "small"]
+    }
+  ],
+  "statistics": {
+    "totalClubs": 20,
+    "totalPledgeAmount": 1200000,
+    "onlinePlayers": 478,
+    "lastUpdated": "2025-03-12T19:37:00+08:00"
+  },
+  "announcements": [
+    {
+      "id": "1",
+      "text": "欢迎来到扑克雷达！我们致力于为您提供最优质的线上德州扑克俱乐部资源。",
+      "type": "info"
+    },
+    {
+      "id": "2",
+      "text": "恭喜鲨鱼扑克成为本月质押最高俱乐部！",
+      "type": "highlight"
+    },
+    {
+      "id": "3",
+      "text": "新用户注册即送50USDT试玩金，详情请咨询客服。",
+      "type": "promo"
+    }
+  ]
+}
