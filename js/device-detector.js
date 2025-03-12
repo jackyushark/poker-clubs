@@ -66,9 +66,31 @@ function detectDeviceAndRedirect() {
             
             // 根据当前域名构建完整URL
             const baseUrl = window.location.protocol + '//' + window.location.host;
-            const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
             
-            // 重定向到mobile文件夹中的index.html
+            // 特殊处理GitHub Pages环境
+            let basePath = '';
+            const pathname = window.location.pathname;
+            
+            // 判断是否在GitHub Pages环境下
+            const isGitHubPages = window.location.host.includes('github.io');
+            
+            if (isGitHubPages) {
+                // GitHub Pages格式：username.github.io/repo-name/
+                // 需要保留repo-name
+                const parts = pathname.split('/');
+                if (parts.length >= 2) {
+                    // 包含仓库名的路径
+                    basePath = '/' + parts[1] + '/';
+                }
+            } else {
+                // 正常环境，取当前路径的目录部分
+                basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+            }
+            
+            console.log('[DEBUG] GitHub Pages检测:', isGitHubPages ? '是' : '否');
+            console.log('[DEBUG] 基础路径计算:', basePath);
+            
+            // 重定向到mobile/index.html
             redirectUrl = baseUrl + basePath + 'mobile/index.html';
             
             console.log('[DEBUG] 重定向信息:');
