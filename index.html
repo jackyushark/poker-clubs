@@ -122,6 +122,14 @@
         <div class="content-wrapper">
         <!-- 俱乐部列表 -->
         <section class="clubs-container" id="clubs-container">
+            <!-- 加载状态指示器 -->
+            <div class="loading-message" style="text-align: center; padding: 50px 20px; color: #FFD700;">
+                <div class="spinner" style="margin: 0 auto 20px; width: 40px; height: 40px; border: 3px solid rgba(255,215,0,0.3); border-radius: 50%; border-top-color: #FFD700; animation: spin 1s linear infinite;"></div>
+                <p>正在加载俱乐部数据...</p>
+                <div id="loadingStatus" style="margin-top: 15px; font-size: 14px; color: #AAA;"></div>
+            </div>
+            
+            <!-- 俱乐部卡片将通过JS动态插入 -->
             <!-- 俱乐部卡片1 -->
             <div class="club-card">
                 <div class="card-header">
@@ -372,6 +380,17 @@
         </div>
     </main>
 
-    <script src="js/main.js?v=20250312012250" defer></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase配置和数据服务 -->
+    <script src="js/firebase-config.js?v=20250313"></script>
+    <script src="js/firebase-data-service.js?v=20250313"></script>
+    
+    <!-- 主脚本 -->
+    <script src="js/main.js?v=20250313" defer></script>
 </body>
 </html>

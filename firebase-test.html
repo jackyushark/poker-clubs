@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase测试页面 - 扑克雷达</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0A;
+            color: #FFFFFF;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #121212;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        .log-container {
+            background-color: #1A1A1A;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .club-container {
+            margin-top: 20px;
+        }
+        .club-item {
+            background-color: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .club-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            margin-right: 15px;
+            background-color: #000;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .club-info {
+            flex: 1;
+        }
+        .club-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            color: #FFD700;
+        }
+        .club-details {
+            font-size: 14px;
+            color: #CCC;
+        }
+        .error {
+            color: #FF6B6B;
+            padding: 10px;
+            background-color: rgba(255, 107, 107, 0.2);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #FFCC00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>扑克雷达 - Firebase测试页面</h1>
+        
+        <div>
+            <button id="testConnectionBtn">测试Firebase连接</button>
+            <button id="loadClubsBtn">加载俱乐部数据</button>
+            <button id="clearLogBtn">清除日志</button>
+        </div>
+        
+        <div class="log-container" id="logContainer">等待操作...</div>
+        
+        <div class="club-container" id="clubContainer"></div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        // 日志函数
+        function log(message, isError = false) {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            if (isError) {
+                logEntry.style.color = '#FF6B6B';
+            }
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // 清除日志
+        document.getElementById('clearLogBtn').addEventListener('click', function() {
+            document.getElementById('logContainer').innerHTML = '';
+            log('日志已清除');
+        });
+        
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCB4_vz7xQ6eWLK5FrGPKIQwE5BfIbHdKo",
+            authDomain: "pokerradar-8b40a.firebaseapp.com",
+            projectId: "pokerradar-8b40a",
+            storageBucket: "pokerradar-8b40a.appspot.com",
+            messagingSenderId: "271197653811",
+            appId: "1:271197653811:web:8c4ba1cb00894d5f1e26ec",
+            measurementId: "G-47WVDKN3VY"
+        };
+        
+        // 初始化Firebase
+        log('正在初始化Firebase...');
+        try {
+            firebase.initializeApp(firebaseConfig);
+            log('Firebase初始化成功！版本: ' + firebase.SDK_VERSION);
+        } catch (error) {
+            log('Firebase初始化失败: ' + error.message, true);
+        }
+        
+        // 测试Firebase连接
+        document.getElementById('testConnectionBtn').addEventListener('click', async function() {
+            log('正在测试Firebase连接...');
+            try {
+                const db = firebase.firestore();
+                const timestamp = Date.now().toString();
+                const testDoc = await db.collection('_test_connection').doc(timestamp).set({
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                log('Firebase连接测试成功！');
+                await db.collection('_test_connection').doc(timestamp).delete();
+                log('测试文档已清除');
+            } catch (error) {
+                log('Firebase连接测试失败: ' + error.message, true);
+            }
+        });
+        
+        // 加载俱乐部数据
+        document.getElementById('loadClubsBtn').addEventListener('click', async function() {
+            const clubContainer = document.getElementById('clubContainer');
+            clubContainer.innerHTML = '';
+            log('正在从Firebase加载俱乐部数据...');
+            
+            try {
+                const db = firebase.firestore();
+                const snapshot = await db.collection('clubs').get();
+                
+                if (snapshot.empty) {
+                    log('没有找到俱乐部数据');
+                    clubContainer.innerHTML = '<div class="error">没有找到俱乐部数据</div>';
+                    return;
+                }
+                
+                log(`成功加载 ${snapshot.size} 个俱乐部`);
+                
+                snapshot.forEach(doc => {
+                    const club = doc.data();
+                    log(`处理俱乐部: ${club.name || '未命名俱乐部'} (ID: ${doc.id})`);
+                    
+                    const clubElement = document.createElement('div');
+                    clubElement.className = 'club-item';
+                    
+                    const logoElement = document.createElement('div');
+                    logoElement.className = 'club-logo';
+                    logoElement.style.backgroundImage = `url('${club.logo || 'https://via.placeholder.com/60x60.png?text=俱乐部'}')`;
+                    
+                    const infoElement = document.createElement('div');
+                    infoElement.className = 'club-info';
+                    
+                    const nameElement = document.createElement('h3');
+                    nameElement.className = 'club-name';
+                    nameElement.textContent = club.name || '未命名俱乐部';
+                    
+                    const detailsElement = document.createElement('div');
+                    detailsElement.className = 'club-details';
+                    detailsElement.innerHTML = `
+                        <div>平台: ${club.platform || '未知'}</div>
+                        <div>级别: ${club.level || '未知'}</div>
+                        <div>质押: ${club.isPledged ? `${club.pledge || 0} USDT` : '未质押'}</div>
+                        <div>在线玩家: ${club.onlinePlayers || club.players || 0}</div>
+                    `;
+                    
+                    infoElement.appendChild(nameElement);
+                    infoElement.appendChild(detailsElement);
+                    
+                    clubElement.appendChild(logoElement);
+                    clubElement.appendChild(infoElement);
+                    
+                    clubContainer.appendChild(clubElement);
+                });
+                
+            } catch (error) {
+                log('加载俱乐部数据出错: ' + error.message, true);
+                clubContainer.innerHTML = `<div class="error">加载数据失败: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

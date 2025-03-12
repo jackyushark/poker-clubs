@@ -1,0 +1,362 @@
+/**
+ * 扑克雷达后台管理系统 - 俱乐部管理
+ * 使用Firebase Firestore实现数据存储和管理
+ */
+
+// DOM元素
+const clubsList = document.getElementById('clubs-list');
+const clubForm = document.getElementById('club-form');
+const addClubButton = document.getElementById('add-club-button');
+const clubFormContainer = document.getElementById('club-form-container');
+const saveClubButton = document.getElementById('save-club');
+const cancelButton = document.getElementById('cancel-button');
+const closeFormButton = document.getElementById('close-form');
+const clubSearch = document.getElementById('clubSearch');
+const platformFilter = document.getElementById('platformFilter');
+const pledgeFilter = document.getElementById('pledgeFilter');
+const sortModeToggle = document.getElementById('sortModeToggle');
+const saveSortBtn = document.getElementById('saveSortBtn');
+const cancelSortBtn = document.getElementById('cancelSortBtn');
+
+// 文件上传元素
+const logoFileInput = document.getElementById('club-logo-file');
+const logoFileNameDisplay = document.getElementById('logo-file-name');
+const logoPreview = document.getElementById('logo-preview');
+const logoHiddenInput = document.getElementById('club-logo');
+const screenshotsFileInput = document.getElementById('club-screenshots-file');
+const screenshotsFileNameDisplay = document.getElementById('screenshots-file-name');
+const screenshotsPreview = document.getElementById('screenshots-preview');
+const screenshotsHiddenInput = document.getElementById('club-screenshots');
+
+// 全局变量
+let currentClubId = null; // 当前编辑的俱乐部ID
+let clubsData = []; // 所有俱乐部数据
+let filteredClubs = []; // 筛选后的俱乐部数据
+let currentPage = 1; // 当前页码
+let sortMode = false; // 排序模式
+const clubsPerPage = 10; // 每页显示的俱乐部数
+let uploadedLogoUrl = ''; // 上传的Logo URL
+let uploadedScreenshots = []; // 上传的截图URLs
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 确保Firebase已初始化
+    if (typeof firebase === 'undefined' || !firebase.apps.length) {
+        console.error('Firebase未初始化，管理功能将不可用');
+        return;
+    }
+    
+    // 初始化函数将在身份验证成功后由index.html中的代码调用
+    window.initAdminFunctions = function() {
+        // 加载俱乐部数据
+        loadClubs();
+        
+        // 事件监听
+        addClubButton.addEventListener('click', showAddClubForm);
+        clubForm.addEventListener('submit', saveClub);
+        cancelButton.addEventListener('click', hideClubForm);
+        closeFormButton.addEventListener('click', hideClubForm);
+        
+        // 搜索和筛选功能
+        setupSearchAndFilters();
+        
+        // 排序功能
+        setupSortingFeature();
+        
+        // 文件上传功能
+        setupFileUploads();
+        
+        // 注销按钮
+        const logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                firebase.auth().signOut()
+                    .then(() => {
+                        window.location.href = 'login.html';
+                    })
+                    .catch(error => {
+                        console.error('退出登录失败:', error);
+                    });
+            });
+        }
+    };
+    
+    // 如果用户已登录，直接初始化
+    if (firebase.auth().currentUser) {
+        window.initAdminFunctions();
+    }
+});
+
+// 从Firestore加载俱乐部数据
+async function loadClubs() {
+    try {
+        clubsList.innerHTML = '<div class="loading">加载中...</div>';
+        
+        const snapshot = await db.collection('clubs').orderBy('sortOrder', 'asc').get();
+        clubsData = snapshot.docs.map((doc, index) => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                sortOrder: data.sortOrder || index + 1
+            };
+        });
+        
+        // 初始筛选结果与全部数据相同
+        filteredClubs = [...clubsData];
+        
+        // 更新总页数
+        updatePagination();
+        
+        // 渲染第一页
+        renderClubsList();
+    } catch (error) {
+        console.error('加载俱乐部数据失败:', error);
+        clubsList.innerHTML = '<div class="error-message">加载数据失败，请刷新页面重试</div>';
+    }
+}
+
+// 渲染俱乐部列表
+function renderClubsList() {
+    if (filteredClubs.length === 0) {
+        clubsList.innerHTML = '<div class="no-data">未找到符合条件的俱乐部</div>';
+        return;
+    }
+    
+    // 计算分页
+    const startIndex = (currentPage - 1) * clubsPerPage;
+    const endIndex = Math.min(startIndex + clubsPerPage, filteredClubs.length);
+    const clubsToDisplay = filteredClubs.slice(startIndex, endIndex);
+    
+    // 创建表格
+    let tableHTML = `
+        <table class="clubs-table">
+            <thead>
+                <tr class="table-header-row">
+                    <th style="width: 60px;">Logo</th>
+                    <th>俱乐部名称</th>
+                    <th>平台</th>
+                    <th>级别</th>
+                    <th>质押金额</th>
+                    <th>在线玩家</th>
+                    ${sortMode ? '<th class="sort-column">排序</th>' : ''}
+                    <th class="actions-column">操作</th>
+                </tr>
+            </thead>
+            <tbody id="clubsTableBody">
+    `;
+    
+    clubsToDisplay.forEach((club, index) => {
+        const pledgeAmount = club.pledge ? `${club.pledge} USDT` : '未质押';
+        const rowClass = sortMode ? 'sortable-row' : '';
+        
+        tableHTML += `
+            <tr class="${rowClass}" data-id="${club.id}" data-sort="${club.sortOrder}">
+                <td class="club-logo-cell">
+                    <img src="${club.logo || '../images/default-club.png'}" alt="${club.name}" class="club-logo">
+                </td>
+                <td>
+                    <div class="club-name">${club.name}</div>
+                </td>
+                <td>
+                    <div class="club-platform">${club.platform || '未设置'}</div>
+                </td>
+                <td>${club.level || '未设置'}</td>
+                <td>${pledgeAmount}</td>
+                <td class="players-column">${club.players || 0}</td>
+                ${sortMode ? `
+                <td class="sort-column">
+                    <div class="sort-indicator">${club.sortOrder}</div>
+                    <i class="fas fa-grip-vertical sort-handle"></i>
+                </td>` : ''}
+                <td class="actions-column">
+                    <button class="action-btn edit" onclick="editClub('${club.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteClub('${club.id}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+    
+    clubsList.innerHTML = tableHTML;
+    
+    // 如果在排序模式下，设置拖放功能
+    if (sortMode) {
+        setupDragAndDrop();
+    }
+    
+    // 更新分页控件
+    updatePagination();
+}
+
+// 显示添加俱乐部表单
+function showAddClubForm() {
+    // 设置表单标题
+    document.getElementById('form-title').textContent = '添加俱乐部';
+    
+    // 清空表单并显示
+    clubForm.reset();
+    clubFormContainer.style.display = 'block';
+    document.getElementById('form-overlay').style.display = 'block';
+    
+    // 重置隐藏输入
+    logoHiddenInput.value = '';
+    screenshotsHiddenInput.value = '';
+    
+    // 清除预览
+    if (logoPreview) {
+        logoPreview.style.backgroundImage = '';
+        logoPreview.innerHTML = '';
+    }
+    if (logoFileNameDisplay) {
+        logoFileNameDisplay.textContent = '未选择文件';
+    }
+    if (screenshotsPreview) {
+        screenshotsPreview.innerHTML = '';
+    }
+    if (screenshotsFileNameDisplay) {
+        screenshotsFileNameDisplay.textContent = '未选择文件';
+    }
+    
+    // 重置编辑状态
+    currentClubId = null;
+}
+
+// 显示编辑俱乐部表单
+function showEditClubForm(clubId) {
+    // 获取要编辑的俱乐部数据
+    const clubToEdit = clubsData.find(club => club.id === clubId);
+    if (!clubToEdit) {
+        showNotification('找不到要编辑的俱乐部', 'error');
+        return;
+    }
+    
+    // 设置表单标题
+    document.getElementById('form-title').textContent = '编辑俱乐部';
+    
+    // 填充表单数据
+    document.getElementById('club-name').value = clubToEdit.name || '';
+    document.getElementById('club-platform').value = clubToEdit.platform || '';
+    document.getElementById('club-level').value = clubToEdit.level || '';
+    document.getElementById('club-pledge').value = clubToEdit.pledge || '';
+    document.getElementById('club-openTime').value = clubToEdit.openTime || '';
+    document.getElementById('club-players').value = clubToEdit.players || '';
+    document.getElementById('club-status').value = clubToEdit.status || '正常';
+    
+    // 保存当前编辑的俱乐部ID
+    currentClubId = clubId;
+    
+    // 设置Logo URL到隐藏输入框
+    if (clubToEdit.logo) {
+        logoHiddenInput.value = clubToEdit.logo;
+        // 显示当前Logo预览
+        if (logoPreview) {
+            logoPreview.style.backgroundImage = `url(${clubToEdit.logo})`;
+            logoPreview.innerHTML = '<span class="remove-image">×</span>';
+            logoPreview.querySelector('.remove-image').addEventListener('click', function() {
+                logoPreview.style.backgroundImage = '';
+                logoPreview.innerHTML = '';
+                logoHiddenInput.value = '';
+            });
+        }
+    } else {
+        logoHiddenInput.value = '';
+        if (logoPreview) {
+            logoPreview.style.backgroundImage = '';
+            logoPreview.innerHTML = '';
+        }
+    }
+    
+    // 设置截图URLs到隐藏输入框
+    if (clubToEdit.screenshots && clubToEdit.screenshots.length > 0) {
+        screenshotsHiddenInput.value = JSON.stringify(clubToEdit.screenshots);
+        // 显示当前截图预览
+        if (screenshotsPreview) {
+            screenshotsPreview.innerHTML = '';
+            
+            clubToEdit.screenshots.forEach((url, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'screenshot-preview-item';
+                previewItem.style.backgroundImage = `url(${url})`;
+                
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-image';
+                removeBtn.textContent = '×';
+                removeBtn.dataset.index = index;
+                
+                removeBtn.addEventListener('click', function() {
+                    // 移除预览元素
+                    previewItem.remove();
+                    
+                    // 更新隐藏输入的值
+                    const currentScreenshots = JSON.parse(screenshotsHiddenInput.value || '[]');
+                    currentScreenshots.splice(index, 1);
+                    screenshotsHiddenInput.value = JSON.stringify(currentScreenshots);
+                    
+                    // 重新分配索引
+                    const removeButtons = screenshotsPreview.querySelectorAll('.remove-image');
+                    removeButtons.forEach((btn, i) => {
+                        btn.dataset.index = i;
+                    });
+                });
+                
+                previewItem.appendChild(removeBtn);
+                screenshotsPreview.appendChild(previewItem);
+            });
+        }
+    } else {
+        screenshotsHiddenInput.value = '';
+        if (screenshotsPreview) {
+            screenshotsPreview.innerHTML = '';
+        }
+    }
+    
+    // 显示表单
+    clubFormContainer.style.display = 'block';
+    document.getElementById('form-overlay').style.display = 'block';
+}
+
+// 隐藏俱乐部表单
+function hideClubForm() {
+    // 重置表单
+    clubForm.reset();
+    // 清除预览
+    if (logoPreview) {
+        logoPreview.style.backgroundImage = '';
+        logoPreview.innerHTML = '';
+    }
+    if (logoFileNameDisplay) {
+        logoFileNameDisplay.textContent = '未选择文件';
+    }
+    if (screenshotsPreview) {
+        screenshotsPreview.innerHTML = '';
+    }
+    if (screenshotsFileNameDisplay) {
+        screenshotsFileNameDisplay.textContent = '未选择文件';
+    }
+    
+    // 隐藏表单容器和遮罩
+    clubFormContainer.style.display = 'none';
+    document.getElementById('form-overlay').style.display = 'none';
+    
+    // 重置当前编辑的俱乐部ID
+    currentClubId = null;
+    
+    // 重置上传变量
+    uploadedLogoUrl = '';
+    uploadedScreenshots = [];
+    
+    // 重置隐藏输入
+    logoHiddenInput.value = '';
+    screenshotsHiddenInput.value = '';
+}
+
+// ...其余代码保持不变...

@@ -1,11 +1,19 @@
 // 扑克雷达 - 前端主要脚本
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 加载数据服务
-    loadDataService().then(() => {
-        // 此处放置需要在数据加载后执行的初始化逻辑
-        // 例如：setupCategoryFilters(), loadAndDisplayClubs()等
-    });
+    console.log('初始化扑克雷达应用...');
+    
+    // 检查Firebase是否已初始化
+    if (typeof firebase === 'undefined') {
+        console.error('Firebase未初始化，请检查firebase脚本是否正确加载');
+        document.querySelector('.clubs-container').innerHTML = '<div class="error-message">数据加载失败：Firebase未初始化</div>';
+        return;
+    }
+    
+    console.log('Firebase已初始化，版本:', firebase.SDK_VERSION);
+    
+    // 加载数据服务并初始化应用
+    initializeApp();
 });
 
 // 加载数据服务
@@ -47,23 +55,20 @@ function setupCategoryFilters() {
 }
 
 // 加载并显示所有俱乐部
-function loadAndDisplayClubs() {
+function loadAndDisplayClubs(clubs) {
     const clubsContainer = document.querySelector('.clubs-container');
     if (!clubsContainer) return;
     
     // 清空容器
     clubsContainer.innerHTML = '';
     
-    // 从dataLoader获取俱乐部数据
-    if (window.clubsData && window.clubsData.length) {
+    // 检查俱乐部数据
+    if (clubs && clubs.length) {
         // 按质押金额排序
-        const sortedClubs = [...window.clubsData].sort((a, b) => b.pledgeAmount - a.pledgeAmount);
+        const sortedClubs = [...clubs].sort((a, b) => b.pledgeAmount - a.pledgeAmount);
         
         // 应用当前的分类过滤器
         filterClubsByCategory(sortedClubs, activeCategory);
-        
-        // 更新质押金额排行榜
-        updatePledgeRanking(sortedClubs);
     } else {
         clubsContainer.innerHTML = '<div class="error-message">暂无俱乐部数据</div>';
     }
@@ -535,4 +540,107 @@ function setupViewToggle() {
             localStorage.setItem('pokerRadarViewMode', view);
         });
     });
+}
+
+// 初始化应用
+async function initializeApp() {
+    try {
+        // 显示加载状态
+        const clubsContainer = document.querySelector('.clubs-container');
+        clubsContainer.innerHTML = '<div class="loading-animation"><div class="spinner"></div><p>加载中...</p></div>';
+        
+        // 初始化视图切换
+        setupViewToggle();
+        
+        // 设置分类筛选功能
+        setupCategoryFilters();
+        
+        // 设置登录按钮
+        setupLoginButton();
+        
+        // 从Firebase加载数据
+        await loadDataFromFirebase();
+        
+        // 加载公告
+        loadAndDisplayAnnouncements();
+    } catch (error) {
+        console.error('初始化应用出错:', error);
+        showErrorMessage('加载数据失败: ' + error.message);
+    }
+}
+
+// 从Firebase加载数据
+async function loadDataFromFirebase() {
+    try {
+        console.log('开始从Firebase加载数据...');
+        
+        // 更新加载状态
+        const loadingStatus = document.getElementById('loadingStatus');
+        if (loadingStatus) {
+            loadingStatus.textContent = '连接Firebase数据库...';
+        }
+        
+        // 使用我们创建的数据服务获取俱乐部数据
+        const dataService = window.PokerRadarApp.dataService;
+        if (!dataService) {
+            throw new Error('数据服务未初始化');
+        }
+        
+        // 更新加载状态
+        if (loadingStatus) {
+            loadingStatus.textContent = '获取俱乐部数据...';
+        }
+        
+        // 获取俱乐部数据
+        const clubs = await dataService.getClubs();
+        
+        // 保存数据到全局变量，以便其他功能使用
+        window.clubsData = clubs;
+        
+        // 更新加载状态
+        if (loadingStatus) {
+            loadingStatus.textContent = `成功加载 ${clubs.length} 个俱乐部，正在渲染...`;
+        }
+        
+        // 显示俱乐部数据
+        loadAndDisplayClubs(clubs);
+        
+        // 更新统计数据
+        updateStatistics();
+        
+        // 更新质押排行榜
+        updatePledgeRanking(clubs);
+        
+        console.log('数据加载完成，共加载俱乐部数量:', clubs.length);
+        
+        // 添加一个小延时后移除加载状态
+        setTimeout(() => {
+            const loadingMessage = document.querySelector('.loading-message');
+            if (loadingMessage && loadingMessage.parentNode) {
+                loadingMessage.parentNode.removeChild(loadingMessage);
+            }
+        }, 500);
+        
+        return clubs;
+    } catch (error) {
+        console.error('从Firebase加载数据失败:', error);
+        
+        // 显示错误消息
+        const clubsContainer = document.querySelector('.clubs-container');
+        if (clubsContainer) {
+            clubsContainer.innerHTML = `
+                <div style="text-align: center; padding: 50px 20px;">
+                    <div style="font-size: 24px; color: #FF6B6B; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-circle"></i> 数据加载失败
+                    </div>
+                    <p style="color: #AAA; max-width: 500px; margin: 0 auto;">
+                        无法从Firebase加载俱乐部数据: ${error.message}<br>
+                        请检查您的网络连接并刷新页面重试。
+                    </p>
+                </div>
+            `;
+        }
+        
+        throw error;
+    }
 }

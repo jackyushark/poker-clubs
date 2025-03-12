@@ -1,28 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 排序模式状态
     let sortMode = false;
+    let clubs = []; // 保存从Firebase加载的俱乐部数据
     
-    // 加载数据服务
-    loadDataService().then(() => {
-        // 加载俱乐部列表
-        loadClubsList();
-        
-        // 设置搜索和筛选功能
-        setupSearchAndFilters();
-        
-        // 设置排序功能
-        setupSortingFeature();
-        
-        // 设置登出功能
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('adminLoggedIn');
-            window.location.href = 'login.html';
-        });
-    }).catch(error => {
-        console.error('无法加载数据服务:', error);
-        alert('无法加载数据服务，请稍后再试');
-    });
+    // 确保Firebase已经初始化
+    if (!firebase || !firebase.firestore) {
+        console.error('Firebase未正确初始化');
+        return;
+    }
+    
+    const db = firebase.firestore();
+    
+    // 加载俱乐部列表
+    loadClubsList();
+    
+    // 设置搜索和筛选功能
+    setupSearchAndFilters();
+    
+    // 设置排序功能
+    setupSortingFeature();
     
     // 设置排序功能
     function setupSortingFeature() {
@@ -65,30 +61,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // 重新加载俱乐部列表以反映排序模式
-        loadClubsList();
+        renderClubsList();
     }
     
     // 保存排序
     function saveSort() {
-        if (!window.PokerRadarDataService) {
-            showNotification('数据服务不可用', 'error');
-            return;
-        }
-        
         // 获取当前表格中的所有行的ID，按照显示顺序
         const rows = Array.from(document.querySelectorAll('#clubsList tr'));
         const orderedIds = rows.map(row => row.getAttribute('data-id'));
         
-        // 调用数据服务保存排序
-        const result = window.PokerRadarDataService.updateClubsOrder(orderedIds);
+        // 使用Firebase批量更新
+        const batch = db.batch();
         
-        if (result) {
-            // 退出排序模式
-            toggleSortMode();
-            showNotification('排序已保存', 'success');
-        } else {
-            showNotification('保存排序失败', 'error');
-        }
+        // 为每个俱乐部更新sortOrder字段
+        orderedIds.forEach((id, index) => {
+            if (!id) return; // 跳过没有ID的行
+            const clubRef = db.collection('clubs').doc(id);
+            batch.update(clubRef, { sortOrder: index });
+        });
+        
+        // 提交批量更新
+        batch.commit()
+            .then(() => {
+                // 退出排序模式
+                toggleSortMode();
+                showNotification('排序已保存', 'success');
+            })
+            .catch(error => {
+                console.error('保存排序失败:', error);
+                showNotification('保存排序失败', 'error');
+            });
     }
     
     // 取消排序
@@ -185,35 +187,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // 加载数据服务
-    function loadDataService() {
-        return new Promise((resolve, reject) => {
-            if (window.PokerRadarDataService) {
-                resolve();
-                return;
-            }
-            
-            const script = document.createElement('script');
-            script.src = 'js/data-service.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
 
-    // 加载俱乐部列表
+    // 从Firebase加载俱乐部列表
     function loadClubsList() {
-        if (!window.PokerRadarDataService) {
-            console.error('数据服务不可用');
-            return;
-        }
+        // 显示加载中状态
+        const clubsListBody = document.getElementById('clubsList');
+        clubsListBody.innerHTML = '<tr><td colspan="9" class="text-center">加载中...</td></tr>';
         
-        const clubs = window.PokerRadarDataService.getAllClubs();
+        // 从Firestore获取俱乐部数据
+        db.collection('clubs')
+            .orderBy('sortOrder', 'asc') // 按排序顺序
+            .get()
+            .then((snapshot) => {
+                clubs = []; // 清空现有数据
+                
+                console.log('从Firebase获取到数据:', snapshot.size, '条记录'); // 添加调试日志
+                
+                // 处理每个俱乐部文档
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    console.log('俱乐部数据:', doc.id, data); // 添加调试日志，查看数据内容
+                    
+                    clubs.push({
+                        id: doc.id,
+                        name: data.name || '未命名俱乐部',
+                        logoUrl: data.logo || 'https://via.placeholder.com/120',
+                        platform: data.platform || '未指定',
+                        level: data.level || '未指定',
+                        operationTime: data.operationTime || '未指定',
+                        isPledged: data.pledge > 0,
+                        pledgeAmount: data.pledge || 0,
+                        playerCount: data.players || 0,
+                        sortOrder: data.sortOrder || 0
+                    });
+                });
+                
+                // 渲染俱乐部列表
+                renderClubsList();
+                
+                // 更新平台筛选器选项
+                updatePlatformFilterOptions();
+            })
+            .catch((error) => {
+                console.error('获取俱乐部数据失败:', error);
+                clubsListBody.innerHTML = 
+                    '<tr><td colspan="9" class="text-center text-danger">加载失败，请刷新页面重试</td></tr>';
+            });
+    }
+    
+    // 渲染俱乐部列表
+    function renderClubsList() {
         const clubsListBody = document.getElementById('clubsList');
         
         // 清空现有列表
         clubsListBody.innerHTML = '';
+        
+        // 检查是否有数据
+        if (clubs.length === 0) {
+            clubsListBody.innerHTML = 
+                '<tr><td colspan="9" class="text-center">暂无俱乐部数据</td></tr>';
+            return;
+        }
         
         // 生成俱乐部行
         clubs.forEach(club => {
@@ -232,9 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${club.level}</td>
                     <td>${club.operationTime}</td>
                     <td class="${club.isPledged ? 'pledged-cell' : 'unpledged-cell'}">
-                        ${club.isPledged ? `${club.pledgeAmount} USDT` : '未质押'}
+                        ${club.isPledged ? `${club.pledgeAmount.toLocaleString()} USDT` : '未质押'}
                     </td>
-                    <td class="sort-order">#${club.sortOrder || 0}</td>
+                    <td class="sort-order">#${club.sortOrder + 1}</td>
                 `;
                 
                 // 设置为可拖拽
@@ -253,11 +287,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${club.name}</td>
                     <td>${club.platform}</td>
                     <td>${club.level}</td>
-                    <td>${club.operationTime}</td>
+                    <td>${club.operationTime || '未设置'}</td>
                     <td class="${club.isPledged ? 'pledged-cell' : 'unpledged-cell'}">
-                        ${club.isPledged ? `${club.pledgeAmount} USDT` : '未质押'}
+                        ${club.isPledged ? `${club.pledgeAmount.toLocaleString()} USDT` : '未质押'}
                     </td>
                     <td>${club.playerCount}</td>
+                    <td style="display:none;">${club.sortOrder}</td>
                     <td class="actions-cell">
                         <a href="edit-club.html?id=${club.id}" class="btn btn-sm btn-primary">
                             <i class="fas fa-edit"></i> 编辑
@@ -289,14 +324,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 const clubName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
                 
                 if (confirm(`确定要删除 "${clubName}" 俱乐部吗？此操作不可撤销。`)) {
-                    // 使用数据服务删除俱乐部
-                    if (window.PokerRadarDataService && window.PokerRadarDataService.deleteClub(clubId)) {
-                        // 从DOM中移除该行
-                        this.closest('tr').remove();
-                        showNotification(`已删除俱乐部 "${clubName}"`, 'success');
-                    } else {
-                        showNotification('删除失败，请稍后再试', 'error');
-                    }
+                    // 从Firestore删除俱乐部
+                    db.collection('clubs').doc(clubId).delete()
+                        .then(() => {
+                            // 从本地数组中移除
+                            clubs = clubs.filter(club => club.id !== clubId);
+                            
+                            // 从DOM中移除该行
+                            this.closest('tr').remove();
+                            showNotification(`已删除俱乐部 "${clubName}"`, 'success');
+                            
+                            // 检查列表是否为空
+                            if (clubs.length === 0) {
+                                document.getElementById('clubsList').innerHTML = 
+                                    '<tr><td colspan="9" class="text-center">暂无俱乐部数据</td></tr>';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('删除俱乐部失败:', error);
+                            showNotification('删除失败，请稍后再试', 'error');
+                        });
                 }
             });
         });
@@ -317,6 +364,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#clubsList tr');
             
             rows.forEach(row => {
+                if (!row.getAttribute('data-id')) return; // 跳过无数据行
+                
                 const clubName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
                 const platform = row.querySelector('td:nth-child(3)').textContent;
                 const isPledged = row.querySelector('td:nth-child(6)').classList.contains('pledged-cell');
@@ -348,26 +397,33 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', filterClubs);
         platformFilter.addEventListener('change', filterClubs);
         pledgeFilter.addEventListener('change', filterClubs);
+    }
+    
+    // 更新平台筛选器选项
+    function updatePlatformFilterOptions() {
+        const platformFilter = document.getElementById('platformFilter');
+        if (!platformFilter) return;
         
-        // 添加平台选项
-        if (window.PokerRadarDataService) {
-            const clubs = window.PokerRadarDataService.getAllClubs();
-            const platforms = new Set();
-            
-            clubs.forEach(club => platforms.add(club.platform));
-            
-            // 清空现有选项（保留"全部"选项）
-            while (platformFilter.options.length > 1) {
-                platformFilter.remove(1);
+        const platforms = new Set();
+        
+        // 从加载的俱乐部数据中提取平台
+        clubs.forEach(club => {
+            if (club.platform) {
+                platforms.add(club.platform);
             }
-            
-            // 添加新选项
-            platforms.forEach(platform => {
-                const option = document.createElement('option');
-                option.value = platform;
-                option.textContent = platform;
-                platformFilter.appendChild(option);
-            });
+        });
+        
+        // 清空现有选项（保留"全部"选项）
+        while (platformFilter.options.length > 1) {
+            platformFilter.remove(1);
         }
+        
+        // 添加新选项
+        platforms.forEach(platform => {
+            const option = document.createElement('option');
+            option.value = platform;
+            option.textContent = platform;
+            platformFilter.appendChild(option);
+        });
     }
 });
