@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公告管理 - 扑克雷达后台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="radar-icon"></div>
+                    <h1 class="brand-name">POKER RADAR</h1>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span>概览</span>
+                </a>
+                <a href="clubs.html" class="nav-item">
+                    <i class="fas fa-building nav-icon"></i>
+                    <span>俱乐部管理</span>
+                </a>
+                <a href="announcements.html" class="nav-item active">
+                    <i class="fas fa-bullhorn nav-icon"></i>
+                    <span>公告管理</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog nav-icon"></i>
+                    <span>设置</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span>管理员: <span id="currentUser">admin</span></span>
+                <a href="#" id="logoutBtn" style="display: block; margin-top: 10px; color: var(--text-gray);">退出登录</a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h2 class="page-title">公告管理</h2>
+                <div class="action-buttons">
+                    <button id="addAnnouncementBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> 新增公告
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-card announcements-list">
+                <h3 class="form-section-title">公告列表</h3>
+                <div id="announcementsContainer">
+                    <table class="data-table" id="announcementsTable">
+                        <thead>
+                            <tr>
+                                <th width="50%">公告内容</th>
+                                <th width="15%">状态</th>
+                                <th width="20%">更新时间</th>
+                                <th width="15%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 公告数据将通过JS动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 添加/编辑公告的模态框 -->
+            <div class="modal" id="announcementModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modalTitle">添加公告</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="announcementForm">
+                            <input type="hidden" id="announcementId">
+                            
+                            <div class="form-group">
+                                <label for="announcementText">公告内容</label>
+                                <textarea id="announcementText" class="form-control" rows="3" placeholder="输入公告内容..." required></textarea>
+                                <small>提示：使用 | 符号来分隔不同的公告内容，显示时会有更好的视觉效果</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="announcementStatus">状态</label>
+                                <select id="announcementStatus" class="form-control">
+                                    <option value="true">激活</option>
+                                    <option value="false">停用</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelAnnouncementBtn">取消</button>
+                                <button type="submit" class="btn btn-primary" id="saveAnnouncementBtn">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 删除确认模态框 -->
+            <div class="modal" id="deleteConfirmModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>确认删除</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>确定要删除这条公告吗？此操作无法撤销。</p>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/announcements.js"></script>
+</body>
+</html>

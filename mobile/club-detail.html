@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>俱乐部详情 - 扑克雷达</title>
+    <link rel="stylesheet" href="mobile-style.css">
+    <link rel="stylesheet" href="club-detail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+</head>
+<body>
+    <!-- 状态栏模拟 -->
+    <div class="status-bar">
+        <div class="time">20:09</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full battery"></i>
+        </div>
+    </div>
+
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="logo-area">
+            <div class="radar-icon"></div>
+            <div class="brand-name">POKER RADAR</div>
+        </div>
+        <div class="header-actions">
+            <div class="club-stats">
+                <div class="stats-item">
+                    <i class="fas fa-store stats-icon"></i>
+                    <span id="totalClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">收录</span>
+                </div>
+                <div class="stats-item">
+                    <i class="fas fa-shield-alt stats-icon"></i>
+                    <span id="pledgedClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">已质押</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 返回按钮 -->
+    <div class="club-detail-header">
+        <button id="backButton" class="back-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="club-detail-title">俱乐部详情</h1>
+        <button id="shareButton" class="share-btn">
+            <i class="fas fa-share-alt"></i>
+        </button>
+    </div>
+
+    <!-- 俱乐部详情内容 -->
+    <main class="club-detail-content">
+        <div id="errorContainer" class="error-container" style="display: none;"></div>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p>正在加载...</p>
+        </div>
+        
+        <!-- 俱乐部基本信息 -->
+        <div class="club-basic-info">
+            <div class="club-header">
+                <div class="club-logo-container">
+                    <img id="clubLogo" src="../images/placeholder.png" alt="俱乐部Logo" class="club-detail-logo">
+                    <div id="pledgeBadge" class="pledge-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span id="pledgeAmount">质押: 50,000</span>
+                    </div>
+                </div>
+                <div class="club-title-info">
+                    <h2 id="clubName" class="club-detail-name">俱乐部名称</h2>
+                    <div class="club-tags">
+                        <span id="clubPlatform" class="club-tag platform-tag">平台</span>
+                        <span id="clubLevel" class="club-tag level-tag">级别</span>
+                    </div>
+                    <div class="club-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="rating-value">4.5</span>
+                        <span class="rating-count">(126条评价)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="club-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="playerCount">42</div>
+                    <div class="stat-label">在线玩家</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="tableCount">8</div>
+                    <div class="stat-label">牌桌数</div>
+                </div>
+                <div class="stat-item">
+                    <div id="changePercentage" class="stat-value positive">+14.5%</div>
+                    <div class="stat-label">24h变化</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏图片轮播 -->
+        <div class="game-screenshots-section">
+            <h3 class="section-title">游戏截图</h3>
+            <div class="swiper-container">
+                <div class="swiper-wrapper" id="screenshotsWrapper">
+                    <!-- 截图将通过JavaScript动态插入 -->
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- 俱乐部详细信息 -->
+        <div class="club-detailed-info">
+            <h3 class="section-title">详细信息</h3>
+            
+            <div class="info-card">
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <div class="info-content">
+                        <div class="info-label">运营时间</div>
+                        <div id="operationTime" class="info-value">全天候</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-wallet"></i>
+                    <div class="info-content">
+                        <div class="info-label">支付方式</div>
+                        <div id="paymentMethods" class="info-value payment-methods-list">
+                            <!-- 支付方式图标将通过JavaScript动态插入 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-users"></i>
+                    <div class="info-content">
+                        <div class="info-label">常规玩家数量</div>
+                        <div id="regularPlayerCount" class="info-value">150-200人</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-comments"></i>
+                    <div class="info-content">
+                        <div class="info-label">联系方式</div>
+                        <div id="contactInfo" class="info-value">微信: pokerclub888</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 俱乐部特色 -->
+        <div class="club-features">
+            <h3 class="section-title">俱乐部特色</h3>
+            <div id="clubSlogan" class="club-slogan">高手云集，大额对决无限制</div>
+            <div id="featuresList" class="features-list">
+                <!-- 特色标签将通过JavaScript动态插入 -->
+            </div>
+        </div>
+
+        <!-- 俱乐部简介 -->
+        <div class="club-description">
+            <h3 class="section-title">俱乐部简介</h3>
+            <div id="clubDescription" class="description-content">
+                俱乐部简介将在这里显示，由后台管理系统提供。
+            </div>
+        </div>
+
+        <!-- 玩家评价 -->
+        <div class="player-reviews">
+            <h3 class="section-title">玩家评价</h3>
+            <div id="reviewsList" class="reviews-list">
+                <!-- 评价将通过JavaScript动态插入 -->
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-buttons">
+            <a href="#" class="contact-btn">
+                <i class="fas fa-comments"></i>
+                联系客服
+            </a>
+            <a href="#" class="join-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                立即加入
+            </a>
+        </div>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>主页</span>
+        </a>
+        <a href="ranking.html" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>排行榜</span>
+        </a>
+        <a href="app-download.html" class="nav-item">
+            <i class="fas fa-download"></i>
+            <span>APP下载</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="../js/data-service.js"></script>
+    <script src="club-stats.js"></script>
+    <script src="club-detail.js"></script>
+</body>
+</html>

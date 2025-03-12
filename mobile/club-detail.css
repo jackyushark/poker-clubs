@@ -1,0 +1,626 @@
+/* 俱乐部详情页样式 */
+:root {
+    --bg-color: #0A0A0A;
+    --card-bg: #141414;
+    --gold: #FFD700;
+    --gold-gradient: linear-gradient(to right, #FFD700, #FFC107);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-color: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --success-green: #4CAF50;
+    --info-blue: #2196F3;
+    --warning-red: #FF5252;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 80px;
+}
+
+/* 详情页头部 */
+.club-detail-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.back-btn, .share-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 16px;
+}
+
+.club-detail-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    color: white;
+    margin: 0;
+}
+
+/* 俱乐部基本信息 */
+.club-basic-info {
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.club-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.club-logo-container {
+    position: relative;
+}
+
+.club-detail-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+}
+
+.pledge-badge {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    background: var(--gold-gradient);
+    color: black;
+    font-size: 12px;
+    padding: 3px 6px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.club-title-info {
+    flex: 1;
+}
+
+.club-detail-name {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 5px;
+    color: white;
+}
+
+.club-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.club-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.platform-tag {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+}
+
+.level-tag {
+    background-color: rgba(255, 215, 0, 0.2);
+    color: var(--gold);
+}
+
+.club-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.stars {
+    color: var(--gold);
+}
+
+.rating-value {
+    font-weight: 600;
+    color: white;
+}
+
+.rating-count {
+    color: var(--text-secondary);
+}
+
+.club-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-top: 1px solid var(--card-border);
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.positive {
+    color: var(--success-green);
+}
+
+.negative {
+    color: var(--warning-red);
+}
+
+/* 游戏截图轮播 */
+.game-screenshots-section {
+    padding: 20px 15px;
+    background-color: var(--bg-color);
+}
+
+.section-title {
+    font-size: 18px;
+    margin: 0 0 15px;
+    color: white;
+    font-weight: 600;
+}
+
+.swiper-container {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 35px; /* 为分页指示器预留空间 */
+}
+
+.swiper-slide {
+    background-color: var(--card-bg);
+    text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 160px; /* 减小高度以适应并排显示 */
+    margin: 0 2px; /* 添加间距 */
+}
+
+.screenshot-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 保持图片比例 */
+    background-color: var(--card-bg);
+}
+
+.screenshot-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px;
+    font-size: 11px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 调整分页指示器位置 */
+.swiper-pagination {
+    position: absolute;
+    bottom: 5px !important;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.swiper-pagination-bullet {
+    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 0.7;
+    margin: 0 4px !important;
+    width: 8px;
+    height: 8px;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: var(--gold);
+    opacity: 1;
+}
+
+/* 截图占位符 */
+.screenshot-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px;
+}
+
+.screenshot-placeholder i {
+    font-size: 30px;
+    margin-bottom: 8px;
+    color: var(--gold);
+    opacity: 0.7;
+}
+
+.screenshot-placeholder p {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* 适配小屏幕 */
+@media (max-width: 360px) {
+    .swiper-slide {
+        height: 140px;
+    }
+}
+
+/* 俱乐部详细信息 */
+.club-detailed-info, .club-features, .club-description, .player-reviews {
+    padding: 20px 15px;
+    background-color: var(--card-bg);
+    margin-top: 10px;
+}
+
+.info-card {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.info-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item i {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 15px;
+    color: white;
+}
+
+.payment-methods-list {
+    display: flex;
+    gap: 10px;
+}
+
+.payment-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.payment-icon img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* 俱乐部特色 */
+.club-slogan {
+    background: linear-gradient(to right, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    color: var(--gold);
+    font-weight: 500;
+    border-left: 3px solid var(--gold);
+}
+
+.features-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.feature-tag {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.feature-tag i {
+    color: var(--gold);
+}
+
+/* 俱乐部简介 */
+.description-content {
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-line;
+}
+
+/* 玩家评价 */
+.reviews-list {
+    margin-top: 10px;
+}
+
+.review-item {
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.reviewer-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gold);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.reviewer-info {
+    flex: 1;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.review-date {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.review-rating {
+    color: var(--gold);
+    font-size: 14px;
+}
+
+.review-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background-color: rgba(10, 10, 10, 0.95);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+.contact-btn, .join-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    gap: 8px;
+}
+
+.contact-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    margin-right: 10px;
+}
+
+.join-btn {
+    background: var(--gold-gradient);
+    color: black;
+}
+
+/* 加载状态 */
+.loading-state {
+    padding: 50px 0;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid var(--gold);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 加载指示器 */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    text-align: center;
+    background-color: rgba(10, 10, 10, 0.9);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 300px;
+}
+
+.loading-indicator .spinner {
+    margin-bottom: 15px;
+}
+
+.loading-indicator .fa-spinner {
+    font-size: 40px;
+    color: #FFD700;
+    animation: spin 1s linear infinite;
+}
+
+.loading-indicator p {
+    color: #fff;
+    font-size: 18px;
+    margin: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 错误容器 */
+.error-container {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    margin: 20px auto;
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid #FF5252;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.error-icon {
+    margin-bottom: 15px;
+}
+
+.error-icon i {
+    font-size: 40px;
+    color: #FF5252;
+}
+
+.error-message {
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.error-action {
+    display: inline-block;
+    background-color: #FFD700;
+    color: #0A0A0A;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.error-action:hover {
+    background-color: #FFC107;
+    transform: translateY(-2px);
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}

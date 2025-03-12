@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑俱乐部 - 扑克雷达后台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-style.css">
+    <style>
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .file-upload-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .file-upload-preview img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-white);
+            font-size: 14px;
+        }
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(255,215,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="radar-icon"></div>
+                    <h1 class="brand-name">POKER RADAR</h1>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span>概览</span>
+                </a>
+                <a href="clubs.html" class="nav-item active">
+                    <i class="fas fa-building nav-icon"></i>
+                    <span>俱乐部管理</span>
+                </a>
+                <a href="announcements.html" class="nav-item">
+                    <i class="fas fa-bullhorn nav-icon"></i>
+                    <span>公告管理</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog nav-icon"></i>
+                    <span>设置</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span>管理员: <span id="currentUser">admin</span></span>
+                <a href="#" id="logoutBtn" style="display: block; margin-top: 10px; color: var(--text-gray);">退出登录</a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h2 class="page-title">编辑俱乐部</h2>
+                <div class="action-buttons">
+                    <a href="clubs.html" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> 返回列表
+                    </a>
+                </div>
+            </div>
+            
+            <form id="addClubForm" class="form-card">
+                <input type="hidden" id="clubId" name="clubId">
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">基本信息</h3>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="clubName">俱乐部名称 *</label>
+                                <input type="text" id="clubName" name="clubName" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="platform">游戏平台 *</label>
+                                <select id="platform" name="platform" required>
+                                    <option value="">请选择平台</option>
+                                    <option value="微扑克">微扑克</option>
+                                    <option value="HH">HH</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="level">级别大小 *</label>
+                                <input type="text" id="level" name="level" placeholder="例如：2/5, 5/10" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label>操作时间 *</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="time" id="startTime" name="startTime" style="flex: 1;">
+                                    <span>至</span>
+                                    <input type="time" id="endTime" name="endTime" style="flex: 1;">
+                                    <label for="allDay" style="margin-bottom: 0; margin-left: 10px; display: flex; align-items: center; gap: 5px;">
+                                        <input type="checkbox" id="allDay" name="allDay">
+                                        <span>全天候</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label>支付方式 *</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="paymentMethod" value="支付宝">
+                                        <span>支付宝</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="paymentMethod" value="微信支付">
+                                        <span>微信支付</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="paymentMethod" value="USDT">
+                                        <span>USDT</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="paymentMethod" value="银行转账">
+                                        <span>银行转账</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label>当前状态</label>
+                                <select id="clubStatus" name="clubStatus">
+                                    <option value="available">当前可加入</option>
+                                    <option value="unavailable">维护中</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">质押信息</h3>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label>是否已质押</label>
+                                <div style="display: flex; gap: 15px;">
+                                    <label class="checkbox-item">
+                                        <input type="radio" name="isPledged" value="true">
+                                        <span>已质押</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="radio" name="isPledged" value="false" checked>
+                                        <span>未质押</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="pledgeAmount">质押金额（USDT）</label>
+                                <input type="number" id="pledgeAmount" name="pledgeAmount" placeholder="请输入质押金额" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">Logo 和描述</h3>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="clubLogo">俱乐部 Logo</label>
+                                <input type="file" id="clubLogo" name="clubLogo" accept="image/*">
+                                <div class="file-upload-preview" id="logoPreview">
+                                    <i class="fas fa-upload" style="font-size: 40px; color: var(--text-gray);"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="clubSlogan">俱乐部宣传语</label>
+                                <textarea id="clubSlogan" name="clubSlogan" placeholder="请输入俱乐部宣传语，最多100个字"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="input-group">
+                                <label for="playerCount">在线玩家数</label>
+                                <input type="number" id="playerCount" name="playerCount" min="0" placeholder="在线玩家数">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">游戏截图</h3>
+                    <p class="form-section-desc">上传游戏截图可以帮助玩家更直观地了解您的俱乐部。（最多4张，建议尺寸: 1280×720px）</p>
+                    
+                    <div class="screenshots-container" style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+                        <div class="screenshot-item">
+                            <div class="input-group">
+                                <label for="screenshot1">截图 1</label>
+                                <input type="file" id="screenshot1" name="screenshot1" accept="image/*" class="screenshot-input">
+                                <div class="file-upload-preview screenshot-preview" id="screenshotPreview1">
+                                    <i class="fas fa-camera" style="font-size: 40px; color: var(--text-gray);"></i>
+                                </div>
+                                <input type="text" id="screenshotCaption1" name="screenshotCaption1" placeholder="截图描述" style="margin-top: 8px;">
+                            </div>
+                        </div>
+                        
+                        <div class="screenshot-item">
+                            <div class="input-group">
+                                <label for="screenshot2">截图 2</label>
+                                <input type="file" id="screenshot2" name="screenshot2" accept="image/*" class="screenshot-input">
+                                <div class="file-upload-preview screenshot-preview" id="screenshotPreview2">
+                                    <i class="fas fa-camera" style="font-size: 40px; color: var(--text-gray);"></i>
+                                </div>
+                                <input type="text" id="screenshotCaption2" name="screenshotCaption2" placeholder="截图描述" style="margin-top: 8px;">
+                            </div>
+                        </div>
+                        
+                        <div class="screenshot-item">
+                            <div class="input-group">
+                                <label for="screenshot3">截图 3</label>
+                                <input type="file" id="screenshot3" name="screenshot3" accept="image/*" class="screenshot-input">
+                                <div class="file-upload-preview screenshot-preview" id="screenshotPreview3">
+                                    <i class="fas fa-camera" style="font-size: 40px; color: var(--text-gray);"></i>
+                                </div>
+                                <input type="text" id="screenshotCaption3" name="screenshotCaption3" placeholder="截图描述" style="margin-top: 8px;">
+                            </div>
+                        </div>
+                        
+                        <div class="screenshot-item">
+                            <div class="input-group">
+                                <label for="screenshot4">截图 4</label>
+                                <input type="file" id="screenshot4" name="screenshot4" accept="image/*" class="screenshot-input">
+                                <div class="file-upload-preview screenshot-preview" id="screenshotPreview4">
+                                    <i class="fas fa-camera" style="font-size: 40px; color: var(--text-gray);"></i>
+                                </div>
+                                <input type="text" id="screenshotCaption4" name="screenshotCaption4" placeholder="截图描述" style="margin-top: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='clubs.html'">取消</button>
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script src="js/club-form.js"></script>
+</body>
+</html>

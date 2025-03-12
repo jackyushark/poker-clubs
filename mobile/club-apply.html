@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>俱乐部入驻申请 - 扑克雷达</title>
+    <link rel="stylesheet" href="mobile-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .page-title {
+            text-align: center;
+            padding: 15px 0;
+            color: var(--gold);
+            font-size: 24px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 15px;
+        }
+        
+        .club-apply-content {
+            padding: 0 15px 80px;
+        }
+        
+        .apply-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .apply-card-header {
+            background-color: rgba(255, 215, 0, 0.15);
+            padding: 12px 15px;
+            color: var(--gold);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .apply-card-header i {
+            font-size: 18px;
+        }
+        
+        .apply-card-body {
+            padding: 15px;
+        }
+        
+        .apply-card-body p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .apply-card-body ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .apply-card-body li {
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .highlighted-text {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--text-color);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--text-color);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFD700'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+        }
+        
+        .form-checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .form-check-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .form-check-item input {
+            accent-color: var(--gold);
+            width: 16px;
+            height: 16px;
+        }
+        
+        .form-check-item label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .submit-button {
+            background: var(--gold-gradient);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .submit-button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+        
+        .benefit-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            background: linear-gradient(to right, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+            color: var(--gold);
+            border-radius: 4px;
+            font-size: 13px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--gold);
+        }
+        
+        .club-stats {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stats-icon {
+            font-size: 16px;
+        }
+        
+        .stats-count {
+            font-weight: 600;
+        }
+        
+        .stats-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏模拟 -->
+    <div class="status-bar">
+        <div class="time">20:09</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full battery"></i>
+        </div>
+    </div>
+
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="logo-area">
+            <div class="radar-icon"></div>
+            <div class="brand-name">POKER RADAR</div>
+        </div>
+        <div class="header-actions">
+            <div class="club-stats">
+                <div class="stats-item">
+                    <i class="fas fa-store stats-icon"></i>
+                    <span id="totalClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">收录</span>
+                </div>
+                <div class="stats-item">
+                    <i class="fas fa-shield-alt stats-icon"></i>
+                    <span id="pledgedClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">已质押</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题 -->
+    <div class="page-title">俱乐部入驻申请</div>
+
+    <!-- 俱乐部入驻申请内容 -->
+    <div class="club-apply-content">
+        <div class="apply-card">
+            <div class="apply-card-header">
+                <i class="fas fa-crown"></i>
+                入驻优势
+            </div>
+            <div class="apply-card-body">
+                <p>入驻扑克雷达平台，与众多优质俱乐部一起成长，获取更多曝光和资源：</p>
+                <div>
+                    <span class="benefit-tag"><i class="fas fa-users"></i> 海量玩家流量</span>
+                    <span class="benefit-tag"><i class="fas fa-shield-alt"></i> 平台信誉背书</span>
+                    <span class="benefit-tag"><i class="fas fa-chart-line"></i> 数据分析支持</span>
+                    <span class="benefit-tag"><i class="fas fa-bullhorn"></i> 专属活动推广</span>
+                    <span class="benefit-tag"><i class="fas fa-award"></i> 资质认证标识</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="apply-card">
+            <div class="apply-card-header">
+                <i class="fas fa-clipboard-list"></i>
+                入驻条件
+            </div>
+            <div class="apply-card-body">
+                <p>我们对申请入驻的俱乐部有以下基本要求：</p>
+                <ul>
+                    <li>俱乐部运营时间不少于<span class="highlighted-text">3个月</span></li>
+                    <li>持有有效的平台授权或自主运营资质</li>
+                    <li>具备一定规模的活跃玩家基础</li>
+                    <li>能够提供<span class="highlighted-text">透明、稳定</span>的资金结算流程</li>
+                    <li>团队能够提供<span class="highlighted-text">7×24小时</span>的客户服务</li>
+                    <li>无不良运营记录，信誉良好</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="apply-card">
+            <div class="apply-card-header">
+                <i class="fas fa-file-alt"></i>
+                申请表单
+            </div>
+            <div class="apply-card-body">
+                <form id="clubApplyForm">
+                    <div class="form-group">
+                        <label for="clubName" class="form-label">俱乐部名称 *</label>
+                        <input type="text" id="clubName" class="form-input" placeholder="请输入俱乐部名称" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="platform" class="form-label">所属平台 *</label>
+                        <select id="platform" class="form-select" required>
+                            <option value="" disabled selected>请选择平台</option>
+                            <option value="GGPoker">GGPoker</option>
+                            <option value="PokerStars">PokerStars</option>
+                            <option value="888poker">888poker</option>
+                            <option value="PPPoker">PPPoker</option>
+                            <option value="PokerBros">PokerBros</option>
+                            <option value="Upoker">Upoker</option>
+                            <option value="KingPoker">KingPoker</option>
+                            <option value="other">其他平台</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactPerson" class="form-label">联系人 *</label>
+                        <input type="text" id="contactPerson" class="form-input" placeholder="请输入联系人姓名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactWay" class="form-label">联系方式 *</label>
+                        <input type="text" id="contactWay" class="form-input" placeholder="手机号/微信号/Telegram" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="playerCount" class="form-label">日均活跃玩家数 *</label>
+                        <select id="playerCount" class="form-select" required>
+                            <option value="" disabled selected>请选择范围</option>
+                            <option value="0-20">0-20人</option>
+                            <option value="21-50">21-50人</option>
+                            <option value="51-100">51-100人</option>
+                            <option value="101-200">101-200人</option>
+                            <option value="201+">200人以上</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="blindLevels" class="form-label">主要级别 *</label>
+                        <div class="form-checks">
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level1" name="blindLevels" value="1/2">
+                                <label for="level1">1/2</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level2" name="blindLevels" value="2/5">
+                                <label for="level2">2/5</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level3" name="blindLevels" value="5/10">
+                                <label for="level3">5/10</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level4" name="blindLevels" value="10/20">
+                                <label for="level4">10/20</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level5" name="blindLevels" value="25/50">
+                                <label for="level5">25/50</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="level6" name="blindLevels" value="50/100+">
+                                <label for="level6">50/100+</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paymentMethods" class="form-label">支付方式 *</label>
+                        <div class="form-checks">
+                            <div class="form-check-item">
+                                <input type="checkbox" id="payment1" name="paymentMethods" value="支付宝">
+                                <label for="payment1">支付宝</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="payment2" name="paymentMethods" value="微信">
+                                <label for="payment2">微信</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="payment3" name="paymentMethods" value="银行卡">
+                                <label for="payment3">银行卡</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="payment4" name="paymentMethods" value="USDT">
+                                <label for="payment4">USDT</label>
+                            </div>
+                            <div class="form-check-item">
+                                <input type="checkbox" id="payment5" name="paymentMethods" value="其他">
+                                <label for="payment5">其他</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clubDescription" class="form-label">俱乐部简介</label>
+                        <textarea id="clubDescription" class="form-input form-textarea" placeholder="请简要描述您的俱乐部特色、历史和优势"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-paper-plane"></i> 提交申请
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        返回主页
+    </a>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>主页</span>
+        </a>
+        <a href="ranking.html" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>排行榜</span>
+        </a>
+        <a href="app-download.html" class="nav-item">
+            <i class="fas fa-download"></i>
+            <span>APP下载</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="../admin/js/data-service.js"></script>
+    <script src="club-stats.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 如果链接已经包含href属性，则不需要额外处理
+                    if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                        return;
+                    }
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 表单提交处理
+            const form = document.getElementById('clubApplyForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // 简单验证
+                const clubName = document.getElementById('clubName').value;
+                const platform = document.getElementById('platform').value;
+                const contactPerson = document.getElementById('contactPerson').value;
+                const contactWay = document.getElementById('contactWay').value;
+                
+                if (!clubName || !platform || !contactPerson || !contactWay) {
+                    alert('请填写必填项');
+                    return;
+                }
+                
+                // 模拟提交成功
+                alert('申请已提交成功！我们的工作人员会尽快与您联系。');
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>

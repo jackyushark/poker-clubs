@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>质押信任榜 - 扑克雷达</title>
+    <link rel="stylesheet" href="mobile-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .ranking-header {
+            background-color: var(--dark-bg);
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .ranking-title {
+            color: var(--gold);
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .ranking-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .ranking-list {
+            padding: 0 15px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        
+        .ranking-position {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        
+        .position-1 {
+            background-color: var(--gold);
+            color: black;
+        }
+        
+        .position-2 {
+            background-color: #C0C0C0;
+            color: black;
+        }
+        
+        .position-3 {
+            background-color: #CD7F32;
+            color: black;
+        }
+        
+        .position-other {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+        
+        .ranking-club-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ranking-club-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .ranking-club-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .ranking-club-details {
+            flex: 1;
+        }
+        
+        .ranking-club-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-color);
+            margin: 0 0 2px 0;
+        }
+        
+        .ranking-club-stats {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .ranking-club-platform {
+            margin-right: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .ranking-pledge-amount {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+        }
+        
+        .ranking-pledge-currency {
+            font-size: 12px;
+            margin-left: 2px;
+            opacity: 0.9;
+        }
+        
+        .ranking-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Loading indicator */
+        .ranking-loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-color);
+        }
+        
+        .ranking-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 15px;
+        }
+        
+        .club-stats {
+            display: flex;
+            align-items: center;
+        }
+        
+        .stats-item {
+            margin-right: 20px;
+        }
+        
+        .stats-icon {
+            margin-right: 5px;
+        }
+        
+        .stats-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏模拟 -->
+    <div class="status-bar">
+        <div class="time">20:09</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full battery"></i>
+        </div>
+    </div>
+
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="logo-area">
+            <div class="radar-icon"></div>
+            <div class="brand-name">POKER RADAR</div>
+        </div>
+        <div class="header-actions">
+            <div class="club-stats">
+                <div class="stats-item">
+                    <i class="fas fa-store stats-icon"></i>
+                    <span id="totalClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">收录</span>
+                </div>
+                <div class="stats-item">
+                    <i class="fas fa-shield-alt stats-icon"></i>
+                    <span id="pledgedClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">已质押</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 排行榜标题 -->
+    <div class="ranking-header">
+        <h1 class="ranking-title">质押信任榜</h1>
+        <p class="ranking-subtitle">按俱乐部质押金额排序</p>
+    </div>
+
+    <!-- 排行榜内容 -->
+    <div class="ranking-list">
+        <!-- 排行榜数据将通过JavaScript动态加载 -->
+        <div class="ranking-loading">
+            <div class="ranking-spinner"></div>
+            <div>加载中...</div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>主页</span>
+        </a>
+        <a href="ranking.html" class="nav-item active">
+            <i class="fas fa-trophy"></i>
+            <span>排行榜</span>
+        </a>
+        <a href="app-download.html" class="nav-item">
+            <i class="fas fa-download"></i>
+            <span>APP下载</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="../js/data-service.js"></script>
+    <script src="club-stats.js"></script>
+    <script src="ranking.js"></script>
+</body>
+</html>

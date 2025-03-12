@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>APP下载 - 扑克雷达</title>
+    <link rel="stylesheet" href="mobile-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* APP下载页面特定样式 */
+        .page-title {
+            text-align: center;
+            padding: 15px 0;
+            color: var(--gold);
+            font-size: 24px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 15px;
+        }
+        
+        .app-list {
+            padding: 0 15px 80px;
+        }
+        
+        .app-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .app-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .app-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-right: 15px;
+            background-color: #171717;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .app-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .app-info {
+            flex: 1;
+        }
+        
+        .app-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--text-white);
+        }
+        
+        .app-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .app-download-btn {
+            background-color: var(--gold);
+            color: #000000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .app-tags {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .app-tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background-color: rgba(0, 180, 216, 0.2);
+            color: var(--bright-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏模拟 -->
+    <div class="status-bar">
+        <div class="time">20:09</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full battery"></i>
+        </div>
+    </div>
+
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="logo-area">
+            <div class="radar-icon"></div>
+            <div class="brand-name">POKER RADAR</div>
+        </div>
+        <div class="header-actions">
+            <div class="club-stats">
+                <div class="stats-item">
+                    <i class="fas fa-store stats-icon"></i>
+                    <span id="totalClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">收录</span>
+                </div>
+                <div class="stats-item">
+                    <i class="fas fa-shield-alt stats-icon"></i>
+                    <span id="pledgedClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">已质押</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题 -->
+    <div class="page-title">德州扑克APP下载</div>
+
+    <!-- APP列表 -->
+    <div class="app-list">
+        <!-- GGPoker -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/ggpoker-logo.png" alt="GGPoker" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=GG'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">GGPoker</h3>
+                <div class="app-tags">
+                    <span class="app-tag">全球知名</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">全球最大的线上扑克平台之一，提供各种级别的现金桌和锦标赛</p>
+                <a href="https://en.ggpoker.com/download/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- PokerStars -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/pokerstars-logo.png" alt="PokerStars" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=PS'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">PokerStars</h3>
+                <div class="app-tags">
+                    <span class="app-tag">官方运营</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">世界上最大的线上扑克平台，拥有全球最多玩家和最丰富的游戏选择</p>
+                <a href="https://www.pokerstars.com/mobile/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- 888poker -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/888poker-logo.png" alt="888poker" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=888'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">888poker</h3>
+                <div class="app-tags">
+                    <span class="app-tag">老牌平台</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">始于1997年的知名扑克品牌，游戏界面友好，适合新手玩家</p>
+                <a href="https://www.888poker.com/mobile/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- PPPoker -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/pppoker-logo.png" alt="PPPoker" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=PPP'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">PPPoker</h3>
+                <div class="app-tags">
+                    <span class="app-tag">俱乐部制</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">全球最大的德州扑克俱乐部平台，采用邀请制，支持建立私人牌局</p>
+                <a href="https://www.pppoker.net/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- PokerBros -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/pokerbros-logo.png" alt="PokerBros" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=Bros'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">PokerBros</h3>
+                <div class="app-tags">
+                    <span class="app-tag">俱乐部制</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">知名德州扑克俱乐部APP，界面精美，支持自定义牌桌和游戏玩法</p>
+                <a href="https://www.pokerbros.net/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- Upoker -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/upoker-logo.png" alt="Upoker" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=UP'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">Upoker</h3>
+                <div class="app-tags">
+                    <span class="app-tag">俱乐部制</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">亚洲流行的扑克俱乐部平台，提供多种德州扑克玩法和赛事</p>
+                <a href="https://www.upoker.com/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+
+        <!-- KingPoker -->
+        <div class="app-item">
+            <div class="app-logo">
+                <img src="../images/kingpoker-logo.png" alt="KingPoker" onerror="this.src='https://placehold.co/60x60/171717/FFD700?text=King'">
+            </div>
+            <div class="app-info">
+                <h3 class="app-name">KingPoker</h3>
+                <div class="app-tags">
+                    <span class="app-tag">俱乐部制</span>
+                    <span class="app-tag">iOS/安卓</span>
+                </div>
+                <p class="app-desc">知名德州扑克平台，提供丰富的游戏玩法和精美的界面设计</p>
+                <a href="https://www.kingpoker.app/" target="_blank" class="app-download-btn">
+                    <i class="fas fa-download"></i>
+                    下载
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>主页</span>
+        </a>
+        <a href="ranking.html" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>排行榜</span>
+        </a>
+        <a href="app-download.html" class="nav-item active">
+            <i class="fas fa-download"></i>
+            <span>APP下载</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="../js/data-service.js"></script>
+    <script src="club-stats.js"></script>
+    <script src="app-download.js"></script>
+</body>
+</html>

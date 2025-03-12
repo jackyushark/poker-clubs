@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>扑克雷达 - 线上德州扑克俱乐部聚合平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20250312012250">
+    <meta name="modified" content="2025-03-12 01:22:50">
+    <style>
+        /* 强制覆盖所有logo尺寸 */
+        .club-logo-table td,
+        .club-logo-table,
+        .club-logo,
+        .club-logo img,
+        .club-logo > div,
+        .club-identity img,
+        .club-identity > div:first-child {
+            width: 80px !important;
+            height: 80px !important;
+            max-width: 80px !important;
+            max-height: 80px !important;
+            min-width: 80px !important;
+            min-height: 80px !important;
+        }
+    </style>
+    <script>
+        // 强制刷新资源的函数
+        window.onload = function() {
+            // 清除缓存
+            const now = new Date().getTime();
+            
+            // 重新加载CSS
+            const oldLink = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
+            if (oldLink) {
+                const newLink = document.createElement('link');
+                newLink.rel = 'stylesheet';
+                newLink.href = 'styles.css?v=' + now;
+                document.head.appendChild(newLink);
+                setTimeout(() => {
+                    oldLink.remove();
+                }, 100);
+            }
+            
+            // 重新加载所有Logo图片
+            document.querySelectorAll('img').forEach(img => {
+                if (img.src.includes('placeholder') || img.alt.includes('Logo') || img.alt.includes('俱乐部')) {
+                    const originalSrc = img.src.split('?')[0];
+                    img.src = originalSrc + '?v=' + now;
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand-area">
+            <div class="logo-container">
+                <div class="radar-icon"></div>
+                <h1 class="brand-name">POKER RADAR</h1>
+            </div>
+            <nav class="quick-links">
+                <a href="#" class="link">品牌故事</a>
+                <span class="divider">|</span>
+                <a href="#" class="link">收录标准</a>
+                <span class="divider">|</span>
+                <a href="#" class="link">合作申请</a>
+            </nav>
+        </div>
+        <div class="function-area">
+            <div class="data-dashboard">
+                <span class="dashboard-item">已收录俱乐部: <strong class="highlight club-count">20</strong>家</span>
+                <span class="divider">|</span>
+                <span class="dashboard-item">总质押: <strong class="highlight pledge-amount">1,200,000</strong> USDT</span>
+            </div>
+            <div class="user-controls">
+                <button class="login-button">登录/注册</button>
+                <div class="language-selector">
+                    <span class="current-lang">中</span>
+                    <span class="lang-option">EN</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- 视图切换控件 - 移动到这里以确保显示 -->
+        <div class="controls-wrapper">
+            <div class="view-controls">
+                <div class="view-title">显示方式:</div>
+                <button class="view-button active" data-view="grid">
+                    <i class="grid-icon"></i>
+                    <span>卡片</span>
+                </button>
+                <button class="view-button" data-view="list">
+                    <i class="list-icon"></i>
+                    <span>列表</span>
+                </button>
+            </div>
+            
+            <!-- 分类导航 -->
+            <div class="category-filters">
+                <div class="filter-title">分类查看:</div>
+                <div class="category-buttons">
+                    <button class="category-button active" data-category="all">全部</button>
+                    <button class="category-button" data-category="pledged">已质押</button>
+                    <button class="category-button" data-category="small">小级别</button>
+                    <button class="category-button" data-category="medium">中级别</button>
+                    <button class="category-button" data-category="large">大级别</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容包装器 -->
+        <div class="content-wrapper">
+        <!-- 俱乐部列表 -->
+        <section class="clubs-container" id="clubs-container">
+            <!-- 俱乐部卡片1 -->
+            <div class="club-card">
+                <div class="card-header">
+                    <div class="club-identity">
+                        <div class="club-logo" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; margin-bottom: 15px; border-radius: 4px; background-color: #121212; background-image: url('https://via.placeholder.com/120'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                        <h2 class="club-name">鲨鱼扑克</h2>
+                    </div>
+                    <div class="pledge-status pledged">
+                        <div class="shield-icon"></div>
+                        <span class="pledge-text">质押 50,000 USDT</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="left-info">
+                        <div class="platform-info">
+                            <div class="platform-logo">微扑克</div>
+                            <span class="level-tag">5/10</span>
+                        </div>
+                        <div class="time-schedule">
+                            <div class="time-label">开放时间</div>
+                            <div class="time-bar">
+                                <div class="time-range">11:00-01:00</div>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <div class="payment-icon" title="支付宝">
+                                <div class="alipay-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="微信支付">
+                                <div class="wechat-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="USDT">
+                                <div class="usdt-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-info">
+                        <p class="club-slogan">高额桌首选，24小时极速到账</p>
+                        <div class="status-info">
+                            <div class="player-count">
+                                <span class="count-label">在线玩家:</span>
+                                <span class="count-value">42</span>
+                            </div>
+                            <div class="availability available">
+                                <span class="status-dot"></span>
+                                <span class="status-text">当前可加入</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="join-button">立即加入</button>
+                    <a href="#" class="report-link">举报</a>
+                </div>
+            </div>
+
+            <!-- 俱乐部卡片2 -->
+            <div class="club-card">
+                <div class="card-header">
+                    <div class="club-identity">
+                        <div class="club-logo" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; margin-bottom: 15px; border-radius: 4px; background-color: #121212; background-image: url('https://via.placeholder.com/120'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                        <h2 class="club-name">王牌俱乐部</h2>
+                    </div>
+                    <div class="pledge-status unpledged">
+                        <div class="warning-icon"></div>
+                        <span class="pledge-text">未质押</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="left-info">
+                        <div class="platform-info">
+                            <div class="platform-logo">HH</div>
+                            <span class="level-tag">3/5</span>
+                        </div>
+                        <div class="time-schedule">
+                            <div class="time-label">开放时间</div>
+                            <div class="time-bar">
+                                <div class="time-range">14:00-04:00</div>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <div class="payment-icon" title="支付宝">
+                                <div class="alipay-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="微信支付">
+                                <div class="wechat-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-info">
+                        <p class="club-slogan">新手友好环境，专业培训指导</p>
+                        <div class="status-info">
+                            <div class="player-count">
+                                <span class="count-label">在线玩家:</span>
+                                <span class="count-value">21</span>
+                            </div>
+                            <div class="availability unavailable">
+                                <span class="status-dot"></span>
+                                <span class="status-text">维护中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="join-button">立即加入</button>
+                    <a href="#" class="report-link">举报</a>
+                </div>
+            </div>
+
+            <!-- 俱乐部卡片3 -->
+            <div class="club-card">
+                <div class="card-header">
+                    <div class="club-identity">
+                        <div class="club-logo" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; margin-bottom: 15px; border-radius: 4px; background-color: #121212; background-image: url('https://via.placeholder.com/120'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                        <h2 class="club-name">黄金俱乐部</h2>
+                    </div>
+                    <div class="pledge-status pledged">
+                        <div class="shield-icon"></div>
+                        <span class="pledge-text">质押 100,000 USDT</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="left-info">
+                        <div class="platform-info">
+                            <div class="platform-logo">微扑克</div>
+                            <span class="level-tag">10/20</span>
+                        </div>
+                        <div class="time-schedule">
+                            <div class="time-label">开放时间</div>
+                            <div class="time-bar">
+                                <div class="time-range">全天候</div>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <div class="payment-icon" title="支付宝">
+                                <div class="alipay-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="微信支付">
+                                <div class="wechat-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="USDT">
+                                <div class="usdt-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-info">
+                        <p class="club-slogan">高手云集，大额对决无限制</p>
+                        <div class="status-info">
+                            <div class="player-count">
+                                <span class="count-label">在线玩家:</span>
+                                <span class="count-value">65</span>
+                            </div>
+                            <div class="availability available">
+                                <span class="status-dot"></span>
+                                <span class="status-text">当前可加入</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="join-button">立即加入</button>
+                    <a href="#" class="report-link">举报</a>
+                </div>
+            </div>
+
+            <!-- 俱乐部卡片4 -->
+            <div class="club-card">
+                <div class="card-header">
+                    <div class="club-identity">
+                        <div class="club-logo" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; margin-bottom: 15px; border-radius: 4px; background-color: #121212; background-image: url('https://via.placeholder.com/120'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                        <h2 class="club-name">皇家扑克</h2>
+                    </div>
+                    <div class="pledge-status pledged">
+                        <div class="shield-icon"></div>
+                        <span class="pledge-text">质押 80,000 USDT</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="left-info">
+                        <div class="platform-info">
+                            <div class="platform-logo">HH</div>
+                            <span class="level-tag">2/5</span>
+                        </div>
+                        <div class="time-schedule">
+                            <div class="time-label">开放时间</div>
+                            <div class="time-bar">
+                                <div class="time-range">10:00-23:00</div>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <div class="payment-icon" title="支付宝">
+                                <div class="alipay-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="微信支付">
+                                <div class="wechat-icon"></div>
+                            </div>
+                            <div class="payment-icon" title="USDT">
+                                <div class="usdt-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-info">
+                        <p class="club-slogan">最佳新手入门，专业指导</p>
+                        <div class="status-info">
+                            <div class="player-count">
+                                <span class="count-label">在线玩家:</span>
+                                <span class="count-value">36</span>
+                            </div>
+                            <div class="availability available">
+                                <span class="status-dot"></span>
+                                <span class="status-text">当前可加入</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="join-button">立即加入</button>
+                    <a href="#" class="report-link">举报</a>
+                </div>
+            </div>
+        </section>
+
+        <aside class="sidebar">
+            <section class="sidebar-module pledge-ranking">
+                <h3 class="module-title">质押信任榜</h3>
+                <div class="rank-list">
+                    <!-- 由JavaScript动态填充 -->
+                    <div class="loading-placeholder">加载中...</div>
+                </div>
+            </section>
+
+            <section class="sidebar-module announcements">
+                <div class="announcement-container">
+                    <div class="announcement-text">
+                        新俱乐部入驻：『鲨鱼扑克』 | USDT支付手续费全免 | 3月优惠：首次充值送10%
+                    </div>
+                </div>
+                <div class="announcement-controls">
+                    <button class="control-button pause">暂停</button>
+                </div>
+            </section>
+
+            <section class="sidebar-module quick-access">
+                <button class="access-button guide-button">如何安全入局？</button>
+                <button class="access-button apply-button">俱乐部入驻申请</button>
+            </section>
+        </aside>
+        </div>
+    </main>
+
+    <script src="js/main.js?v=20250312012250" defer></script>
+</body>
+</html>

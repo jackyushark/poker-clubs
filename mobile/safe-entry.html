@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>如何安全入局 - 扑克雷达</title>
+    <link rel="stylesheet" href="mobile-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .page-title {
+            text-align: center;
+            padding: 15px 0;
+            color: var(--gold);
+            font-size: 24px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 15px;
+        }
+        
+        .safe-entry-content {
+            padding: 0 15px 80px;
+        }
+        
+        .safety-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .safety-card-header {
+            background-color: rgba(33, 150, 243, 0.15);
+            padding: 12px 15px;
+            color: var(--bright-blue);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+        }
+        
+        .safety-card-header i {
+            font-size: 18px;
+        }
+        
+        .safety-card-body {
+            padding: 15px;
+        }
+        
+        .safety-card-body p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .safety-card-body ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .safety-card-body li {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .warning-text {
+            color: var(--warning-red);
+            font-weight: 500;
+        }
+        
+        .highlighted-text {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        
+        .safety-tip-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--green);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+        
+        .club-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stats-icon {
+            font-size: 18px;
+        }
+        
+        .stats-count {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .stats-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏模拟 -->
+    <div class="status-bar">
+        <div class="time">20:09</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full battery"></i>
+        </div>
+    </div>
+
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="logo-area">
+            <div class="radar-icon"></div>
+            <div class="brand-name">POKER RADAR</div>
+        </div>
+        <div class="header-actions">
+            <div class="club-stats">
+                <div class="stats-item">
+                    <i class="fas fa-store stats-icon"></i>
+                    <span id="totalClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">收录</span>
+                </div>
+                <div class="stats-item">
+                    <i class="fas fa-shield-alt stats-icon"></i>
+                    <span id="pledgedClubsCount" class="stats-count">0</span>
+                    <span class="stats-label">已质押</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题 -->
+    <div class="page-title">如何安全入局?</div>
+
+    <!-- 安全入局内容 -->
+    <div class="safe-entry-content">
+        <div class="safety-card">
+            <div class="safety-card-header">
+                <i class="fas fa-check-circle"></i>
+                选择可信俱乐部
+            </div>
+            <div class="safety-card-body">
+                <p>在选择德州扑克俱乐部时，要特别注意以下几点：</p>
+                <ul>
+                    <li>优先选择在<span class="highlighted-text">扑克雷达平台已质押</span>的俱乐部，质押金额越高表示俱乐部对自身商誉越重视</li>
+                    <li>查看俱乐部运营时间和玩家评价，长期运营且评价良好的俱乐部更值得信任</li>
+                    <li>了解俱乐部的付款方式、结算周期和提款条件，确保资金流转透明</li>
+                </ul>
+                <div>
+                    <span class="safety-tip-tag"><i class="fas fa-lightbulb"></i> 安全提示</span>
+                    <span class="safety-tip-tag"><i class="fas fa-shield-alt"></i> 已质押</span>
+                    <span class="safety-tip-tag"><i class="fas fa-star"></i> 系统推荐</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="safety-card">
+            <div class="safety-card-header">
+                <i class="fas fa-user-shield"></i>
+                账户安全保障
+            </div>
+            <div class="safety-card-body">
+                <p>保护您的账户安全是玩家首要任务：</p>
+                <ul>
+                    <li>使用<span class="highlighted-text">强密码</span>并定期更换，避免使用与其他平台相同的密码</li>
+                    <li>开启<span class="highlighted-text">双重验证</span>，增加账户安全性</li>
+                    <li>不要在公共WiFi下登录您的账户，避免信息被窃取</li>
+                    <li>定期检查账户资金变动，若发现异常立即联系俱乐部客服</li>
+                </ul>
+                <p class="warning-text">警告：请勿将您的账户信息分享给任何人，包括自称是官方客服的人员</p>
+            </div>
+        </div>
+
+        <div class="safety-card">
+            <div class="safety-card-header">
+                <i class="fas fa-money-bill-wave"></i>
+                资金安全管理
+            </div>
+            <div class="safety-card-body">
+                <p>理性管理资金是德州扑克长期盈利的基础：</p>
+                <ul>
+                    <li>设定<span class="highlighted-text">合理的资金管理规则</span>，不要将全部资金都投入一个俱乐部</li>
+                    <li>建议将游戏资金控制在个人可承受亏损范围内</li>
+                    <li>定期提取盈利，不要将所有盈利继续投入游戏</li>
+                    <li>了解俱乐部的转账手续费，避免不必要的费用损失</li>
+                </ul>
+                <p>推荐做法：定期小额提款检验俱乐部资金流动性，确认平台运营稳定</p>
+            </div>
+        </div>
+
+        <div class="safety-card">
+            <div class="safety-card-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                风险识别与预防
+            </div>
+            <div class="safety-card-body">
+                <p>以下情况需要提高警惕：</p>
+                <ul>
+                    <li class="warning-text">新成立的俱乐部突然提供远高于市场的优惠和返利</li>
+                    <li class="warning-text">俱乐部频繁更换联系方式或支付渠道</li>
+                    <li class="warning-text">俱乐部客服回复缓慢或模糊不清，尤其是涉及提款问题</li>
+                    <li class="warning-text">俱乐部要求您安装不明软件或点击可疑链接</li>
+                </ul>
+                <p>如果您遇到上述情况，请谨慎行事，必要时通过<span class="highlighted-text">扑克雷达平台</span>举报相关俱乐部</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        返回主页
+    </a>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>主页</span>
+        </a>
+        <a href="ranking.html" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>排行榜</span>
+        </a>
+        <a href="app-download.html" class="nav-item">
+            <i class="fas fa-download"></i>
+            <span>APP下载</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 如果链接已经包含href属性，则不需要额外处理
+                    if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                        return;
+                    }
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
