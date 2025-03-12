@@ -135,14 +135,46 @@ function detectDeviceAndRedirect() {
         document.body.appendChild(debugElement);
     }
     
-    // 添加强制切换按钮
+    // 始终添加一个移动版按钮，确保用户可以随时切换
+    setTimeout(function() {
+        // 创建浮动切换按钮
+        const mobileSwitcher = document.createElement('div');
+        mobileSwitcher.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: rgba(10,10,10,0.8); border-radius: 30px; padding: 8px 15px; z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5); border: 1px solid #FFD700;';
+        
+        // 构建mobile文件夹URL
+        const baseUrl = window.location.protocol + '//' + window.location.host;
+        const isGitHubPages = window.location.host.includes('github.io');
+        let mobilePath = '';
+        
+        if (isGitHubPages) {
+            const parts = window.location.pathname.split('/');
+            if (parts.length >= 2) {
+                mobilePath = baseUrl + '/' + parts[1] + '/mobile/index.html';
+            }
+        } else {
+            mobilePath = 'mobile/index.html';
+        }
+        
+        console.log('[DEBUG] 移动版链接地址:', mobilePath);
+        
+        mobileSwitcher.innerHTML = `
+            <a href="${mobilePath}" style="color: #FFD700; text-decoration: none; font-size: 14px; display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
+                移动版
+            </a>
+        `;
+        
+        document.body.appendChild(mobileSwitcher);
+    }, 1500);
+    
+    // 添加强制切换按钮 (仅当使用参数时显示)
     if (window.location.search.includes('showSwitcher=true')) {
         const switcherElement = document.createElement('div');
         switcherElement.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.6); border-radius: 5px; padding: 5px; z-index: 9999;';
         
         switcherElement.innerHTML = `
-            <button onclick="window.location.href='?forceMode=mobile'" style="margin-right: 5px; padding: 5px 10px;">移动版</button>
-            <button onclick="window.location.href='?forceMode=desktop'" style="padding: 5px 10px;">PC版</button>
+            <button onclick="window.location.href='?forceMode=mobile'" style="margin-right: 5px; padding: 5px 10px;">强制移动版</button>
+            <button onclick="window.location.href='?forceMode=desktop'" style="padding: 5px 10px;">强制PC版</button>
         `;
         
         document.body.appendChild(switcherElement);
