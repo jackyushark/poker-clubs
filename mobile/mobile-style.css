@@ -417,6 +417,99 @@ body {
     display: none;
 }
 
+/* 支付方式容器样式 */
+.payment-methods-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.payment-label {
+    color: #999;
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+.payment-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* 质押金额样式增强 */
+.pledge-value {
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.pledge-currency {
+    margin-left: 3px;
+    color: #FFD700;
+    font-size: 0.9em;
+}
+
+/* 加载指示器 */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--gold);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 错误和无数据消息 */
+.error-message, .no-data-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 30px 20px;
+    width: 100%;
+    text-align: center;
+    color: #AAA;
+}
+
+.error-message i {
+    font-size: 40px;
+    color: #FF6B6B;
+}
+
+.no-data-message i {
+    font-size: 40px;
+    color: #777;
+}
+
+/* 玩家数量更新动画 */
+.player-count.updated {
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { color: var(--text-color); }
+    50% { color: var(--gold); }
+    100% { color: var(--text-color); }
+}
+
 /* 加载结束提示样式 */
 .loading-end-message {
     text-align: center;
